@@ -634,9 +634,23 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
   .vote-flow { grid-template-columns: 1fr; gap: 10px; }
   .friends-step-card h3 { font-size: 19px; }
   .friends-shot-stage { max-width: 100%; gap: 16px; padding-bottom: 0; }
-  .friends-screens-grid { grid-template-columns: 1fr; gap: 16px; }
-  .friends-screen-a { width: 100%; margin-top: 0; }
-  .friends-screen-b { width: 100%; margin-top: 0; }
+  .friends-screens-grid {
+    grid-template-columns: minmax(0,.9fr) minmax(0,1fr);
+    gap: 10px;
+    max-width: 94%;
+    margin: 0 auto;
+    align-items: start;
+  }
+  .friends-screen-a {
+    width: 100%;
+    margin-top: 18px;
+    transform: rotate(-2.4deg) scale(.98);
+  }
+  .friends-screen-b {
+    width: 100%;
+    margin-top: 0;
+    transform: rotate(2.2deg) scale(.98);
+  }
   .friends-note { width: 100%; margin-bottom: 0; }
 }
 

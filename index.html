@@ -593,6 +593,179 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
   .slide { page-break-after: always; min-height: 100vh; padding: 50px; overflow: visible; }
   body { background: #050506 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+
+/* ── INDIVIDUAL SCREENSHOT COMPOSITIONS ────────────────────────
+   Vertical staging uses layout offsets rather than negative transforms.
+   This keeps raised devices out of the preceding text block and makes
+   every slide feel intentionally composed instead of cloned.             */
+.gradient-text-full {
+  background-image: linear-gradient(90deg, var(--pink) 0%, #f57cab 42%, var(--blue) 100%);
+}
+
+.phone-composition {
+  align-items: start;
+  overflow: visible;
+}
+
+.phone-composition .phone-static {
+  --phone-offset: 0px;
+  --phone-rotation: 0deg;
+  --phone-scale: 1;
+  margin-top: var(--phone-offset);
+  transform: rotate(var(--phone-rotation)) scale(var(--phone-scale));
+  transform-origin: center top;
+}
+
+.phone-composition .phone-static:hover {
+  transform: translateY(-8px) rotate(var(--phone-rotation)) scale(calc(var(--phone-scale) + .01));
+}
+
+/* 02 — editorial pair: primary utility screen, secondary account screen lower */
+.phones-problem {
+  grid-template-columns: 1.08fr .86fr;
+  gap: clamp(14px, 2vw, 28px);
+  padding: 18px 0 clamp(42px, 5vw, 74px);
+}
+.phones-problem .phone-static:nth-child(1) {
+  --phone-offset: 2px;
+  --phone-rotation: -2.2deg;
+  --phone-scale: 1.03;
+}
+.phones-problem .phone-static:nth-child(2) {
+  --phone-offset: clamp(44px, 5vw, 76px);
+  --phone-rotation: 2.8deg;
+  --phone-scale: .89;
+}
+
+/* 05 — strongest asymmetry: swipe is the hero, match is the result below */
+.phones-decision {
+  grid-template-columns: 1.12fr .82fr;
+  gap: clamp(10px, 1.6vw, 22px);
+  padding: 26px 0 clamp(56px, 6vw, 92px);
+}
+.phones-decision .phone-static:nth-child(1) {
+  --phone-offset: 0px;
+  --phone-rotation: -2.6deg;
+  --phone-scale: 1.07;
+}
+.phones-decision .phone-static:nth-child(2) {
+  --phone-offset: clamp(58px, 7vw, 108px);
+  --phone-rotation: 3.4deg;
+  --phone-scale: .86;
+}
+
+/* 06 — descending rhythm from the month overview to shopping in the middle */
+.phones-plan {
+  grid-template-columns: .92fr .82fr 1.08fr;
+  gap: clamp(12px, 2vw, 26px);
+  margin-top: 24px;
+  padding-bottom: clamp(52px, 6vw, 88px);
+}
+.phones-plan .phone-static:nth-child(1) {
+  --phone-offset: clamp(24px, 3vw, 42px);
+  --phone-rotation: -1.8deg;
+  --phone-scale: .95;
+}
+.phones-plan .phone-static:nth-child(2) {
+  --phone-offset: clamp(58px, 6vw, 94px);
+  --phone-rotation: 2.2deg;
+  --phone-scale: .88;
+}
+.phones-plan .phone-static:nth-child(3) {
+  --phone-offset: 0px;
+  --phone-rotation: .8deg;
+  --phone-scale: 1.03;
+}
+
+/* 09 — local-first screen leads, authentication remains visibly secondary */
+.phones-architecture {
+  grid-template-columns: 1.08fr .84fr;
+  gap: clamp(14px, 2vw, 26px);
+  padding: 20px 0 clamp(46px, 5vw, 78px);
+}
+.phones-architecture .phone-static:nth-child(1) {
+  --phone-offset: 0px;
+  --phone-rotation: -1.8deg;
+  --phone-scale: 1.04;
+}
+.phones-architecture .phone-static:nth-child(2) {
+  --phone-offset: clamp(48px, 6vw, 88px);
+  --phone-rotation: 2.8deg;
+  --phone-scale: .88;
+}
+
+/* 12 — shallow arc: centre remains the hero without entering the copy above */
+.phones-close {
+  grid-template-columns: .88fr 1.08fr .86fr;
+  gap: clamp(10px, 1.6vw, 22px);
+  margin-top: 42px;
+  padding-bottom: clamp(48px, 5vw, 74px);
+}
+.phones-close .phone-static:nth-child(1) {
+  --phone-offset: clamp(46px, 5vw, 76px);
+  --phone-rotation: -2.4deg;
+  --phone-scale: .9;
+}
+.phones-close .phone-static:nth-child(2) {
+  --phone-offset: 0px;
+  --phone-rotation: 0deg;
+  --phone-scale: 1.04;
+}
+.phones-close .phone-static:nth-child(3) {
+  --phone-offset: clamp(58px, 6vw, 90px);
+  --phone-rotation: 2.6deg;
+  --phone-scale: .87;
+}
+
+@media (max-width: 1100px) {
+  .phones-problem,
+  .phones-decision,
+  .phones-architecture {
+    max-width: 590px;
+  }
+
+  .phones-plan,
+  .phones-close {
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 700px) {
+  .phone-composition {
+    overflow: hidden;
+  }
+
+  .phones-problem,
+  .phones-decision,
+  .phones-architecture {
+    grid-template-columns: 1.06fr .88fr;
+    padding-top: 8px;
+    padding-bottom: 34px;
+  }
+
+  .phones-problem .phone-static:nth-child(2),
+  .phones-architecture .phone-static:nth-child(2) {
+    --phone-offset: 32px;
+  }
+
+  .phones-decision .phone-static:nth-child(2) {
+    --phone-offset: 44px;
+  }
+
+  .phones-plan,
+  .phones-close {
+    gap: 7px;
+    margin-top: 24px;
+    padding-bottom: 40px;
+  }
+
+  .phones-plan .phone-static:nth-child(1) { --phone-offset: 18px; }
+  .phones-plan .phone-static:nth-child(2) { --phone-offset: 38px; }
+  .phones-close .phone-static:nth-child(1) { --phone-offset: 30px; }
+  .phones-close .phone-static:nth-child(3) { --phone-offset: 38px; }
+}
+
 </style>
 </head>
 <body>
@@ -624,7 +797,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Pitchdeck · App Store Launch</div>
-      <h1 class="reveal delay-1">Was essen wir <span class="gradient-text">heute?</span></h1>
+      <h1 class="reveal delay-1">Was essen wir <span class="gradient-text gradient-text-full">heute?</span></h1>
       <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen, konsequenten Produktfluss — lokal auf dem Gerät, oder live im Haushalt.</p>
       <div class="pill-row reveal delay-3">
         <span class="pill">Local-first</span>
@@ -654,9 +827,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
         <div class="problem"><div class="problem-dot" style="background:var(--green)"></div><p>Nach der Entscheidung beginnt die eigentliche Arbeit erst: Einkaufsliste, Zutaten, Kochen — alles von vorne.</p></div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2">
+    <div class="dual-phones phone-composition phones-problem reveal delay-2">
       <div class="phone-static"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
-      <div class="phone-static" style="transform:translateY(-40px)"><img src="assets/login.webp" alt="Anmeldung und Kollaboration"></div>
+      <div class="phone-static"><img src="assets/login.webp" alt="Anmeldung und Kollaboration"></div>
     </div>
   </div>
 </section>
@@ -827,9 +1000,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
         </div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2">
+    <div class="dual-phones phone-composition phones-decision reveal delay-2">
       <div class="phone-static"><img src="assets/swipe.webp" alt="Woche planen Swipe"></div>
-      <div class="phone-static" style="transform:translateY(-34px)"><img src="assets/match.webp" alt="Envie Matchmoment"></div>
+      <div class="phone-static"><img src="assets/match.webp" alt="Envie Matchmoment"></div>
     </div>
   </div>
 </section>
@@ -841,9 +1014,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
     <div class="eyebrow reveal">Planungsmaschine</div>
     <h2 class="reveal delay-1">Aus Entscheidungen wird Einkauf.</h2>
     <p class="lede reveal delay-2">Woche, Monat und Einkaufsliste sind keine Zusatzmodule — sondern die direkte Fortsetzung der Entscheidung. Zutaten werden dedupliziert, Supermarktkategorien zugeordnet, Family-Haken in Echtzeit synchronisiert.</p>
-    <div class="triple-phones reveal delay-3" style="margin-top:36px">
+    <div class="triple-phones phone-composition phones-plan reveal delay-3">
       <div class="phone-static"><img src="assets/weekplan.webp" alt="Wochenplan"></div>
-      <div class="phone-static" style="transform:translateY(-30px)"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
+      <div class="phone-static"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
       <div class="phone-static"><img src="assets/month.webp" alt="Monatsplan"></div>
     </div>
   </div>
@@ -956,9 +1129,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
         </div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2">
+    <div class="dual-phones phone-composition phones-architecture reveal delay-2">
       <div class="phone-static"><img src="assets/household.webp" alt="Haushalt verwalten"></div>
-      <div class="phone-static" style="transform:translateY(-34px)"><img src="assets/login.webp" alt="Anmeldung"></div>
+      <div class="phone-static"><img src="assets/login.webp" alt="Anmeldung"></div>
     </div>
   </div>
 </section>
@@ -1041,9 +1214,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
     <div class="close-cta-row reveal delay-3">
       <a class="cta" href="#slide-1">Envie · zurück zum Anfang ↗</a>
     </div>
-    <div class="triple-phones reveal delay-4" style="margin-top:48px">
+    <div class="triple-phones phone-composition phones-close reveal delay-4">
       <div class="phone-static"><img src="assets/swipe.webp" alt="Swipe"></div>
-      <div class="phone-static" style="transform:translateY(-35px)"><img src="assets/weekplan.webp" alt="Plan"></div>
+      <div class="phone-static"><img src="assets/weekplan.webp" alt="Plan"></div>
       <div class="phone-static"><img src="assets/cooking.webp" alt="Kochen"></div>
     </div>
   </div>

@@ -12,7 +12,7 @@
   --bg:#050506;
   --surface:#111114;
   --surface-2:#18181d;
-  --line:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.09);
   --text:#f7f7f5;
   --muted:#aaaab3;
   --pink:#ff4d8d;
@@ -20,103 +20,57 @@
   --blue:#23b8f5;
   --green:#83d8ad;
   --amber:#f1b858;
-  --radius:28px;
+  --radius:24px;
   --shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
 }
 
 /* ── RESET ────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--bg); scroll-behavior: smooth; }
+html { background: var(--bg); scroll-behavior: smooth; overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
-  max-width: 100vw;
+  /* fix overscroll */
+  overscroll-behavior-y: none;
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
 
 /* ── AMBIENT GRADIENT BG ─────────────────────────────────────── */
-.ambient-orbs {
-  position: fixed;
-  inset: 0;
-  z-index: -5;
-  pointer-events: none;
-  overflow: hidden;
-}
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0;
-  animation: orb-float linear infinite;
-  will-change: transform, opacity;
-}
-.orb-1 {
-  width: 60vw; height: 60vw;
-  left: -15vw; top: 10vh;
-  background: radial-gradient(circle, rgba(255,77,141,.22) 0%, transparent 70%);
-  animation-duration: 28s;
-  animation-delay: 0s;
-}
-.orb-2 {
-  width: 50vw; height: 50vw;
-  right: -10vw; top: 40vh;
-  background: radial-gradient(circle, rgba(35,184,245,.18) 0%, transparent 70%);
-  animation-duration: 34s;
-  animation-delay: -8s;
-}
-.orb-3 {
-  width: 40vw; height: 40vw;
-  left: 30vw; bottom: 10vh;
-  background: radial-gradient(circle, rgba(131,216,173,.1) 0%, transparent 70%);
-  animation-duration: 22s;
-  animation-delay: -14s;
-}
+.ambient-orbs { position: fixed; inset: 0; z-index: -5; pointer-events: none; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; animation: orb-float linear infinite; }
+.orb-1 { width: 60vw; height: 60vw; left: -15vw; top: 10vh; background: radial-gradient(circle, rgba(255,77,141,.18) 0%, transparent 70%); animation-duration: 28s; }
+.orb-2 { width: 50vw; height: 50vw; right: -10vw; top: 40vh; background: radial-gradient(circle, rgba(35,184,245,.15) 0%, transparent 70%); animation-duration: 34s; animation-delay: -8s; }
+.orb-3 { width: 40vw; height: 40vw; left: 30vw; bottom: 10vh; background: radial-gradient(circle, rgba(131,216,173,.08) 0%, transparent 70%); animation-duration: 22s; animation-delay: -14s; }
 @keyframes orb-float {
-  0%   { transform: translate(0px, 0px) scale(1);    opacity: 0; }
-  10%  { opacity: 1; }
-  33%  { transform: translate(4vw, -3vh) scale(1.08); }
+  0%   { transform: translate(0px, 0px) scale(1); }
+  33%  { transform: translate(4vw, -3vh) scale(1.06); }
   66%  { transform: translate(-3vw, 4vh) scale(.94); }
-  90%  { opacity: 1; }
-  100% { transform: translate(0px, 0px) scale(1);    opacity: 0; }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 /* ── NAV ─────────────────────────────────────────────────────── */
 .deck-nav {
-  position: fixed;
-  top: 22px; left: 24px; right: 24px;
-  z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
+  position: fixed; top: 22px; left: 24px; right: 24px;
+  z-index: 100; display: flex; align-items: center; justify-content: space-between;
   pointer-events: none;
 }
 .brand, .deck-controls { pointer-events: auto; }
-.brand {
-  display: flex; align-items: center; gap: 12px;
-  font-weight: 760; letter-spacing: -.02em;
-}
-.brand-mark {
-  position: relative; width: 34px; height: 26px;
-}
-.brand-mark i {
-  position: absolute; display: block;
-  width: 20px; height: 26px; border-radius: 7px;
-  transition: transform .4s cubic-bezier(.2,.8,.2,1);
-}
+.brand { display: flex; align-items: center; gap: 12px; font-weight: 760; letter-spacing: -.02em; }
+.brand-mark { position: relative; width: 34px; height: 26px; }
+.brand-mark i { position: absolute; display: block; width: 20px; height: 26px; border-radius: 7px; transition: transform .4s cubic-bezier(.2,.8,.2,1); }
 .brand-mark i:first-child { left: 0; background: var(--pink); }
-.brand-mark i:last-child  { right: 0; background: var(--blue); }
+.brand-mark i:last-child { right: 0; background: var(--blue); }
 .brand:hover .brand-mark i:first-child { transform: rotate(-8deg) translateX(-2px); }
-.brand:hover .brand-mark i:last-child  { transform: rotate(8deg) translateX(2px); }
-.brand small {
-  font-size: 11px; color: var(--muted);
-  font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-}
+.brand:hover .brand-mark i:last-child { transform: rotate(8deg) translateX(2px); }
+.brand small { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .brand-text { display: flex; flex-direction: column; line-height: 1; }
 .deck-controls {
   display: flex; gap: 8px; padding: 6px;
   border: 1px solid var(--line);
-  background: rgba(8,8,10,.8);
+  background: rgba(8,8,10,.85);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: 999px;
@@ -125,61 +79,40 @@ button { font: inherit; }
   border: 0; background: transparent; color: var(--muted);
   width: 36px; height: 36px; border-radius: 50%;
   cursor: pointer; transition: all .2s ease;
-  position: relative; overflow: hidden;
 }
-.deck-controls button::after {
-  content: "";
-  position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.15), transparent);
-  opacity: 0; transition: opacity .2s;
-}
-.deck-controls button:hover { color: #fff; }
-.deck-controls button:hover::after { opacity: 1; }
-.deck-controls button:active { transform: scale(.9); }
+.deck-controls button:hover { color: #fff; background: rgba(255,255,255,.1); }
+.deck-controls button:active { transform: scale(.88); }
 
-/* ── PROGRESS BAR ─────────────────────────────────────────────── */
+/* ── PROGRESS ─────────────────────────────────────────────────── */
 .progress {
-  position: fixed; top: 0; left: 0;
-  height: 2px;
+  position: fixed; top: 0; left: 0; height: 2px;
   background: linear-gradient(90deg, var(--pink), var(--blue), var(--green));
   background-size: 200% 100%;
   width: 0; z-index: 120;
   transition: width .08s linear;
-  animation: progress-shimmer 3s linear infinite;
-  box-shadow: 0 0 12px rgba(255,77,141,.6);
+  animation: pshimmer 3s linear infinite;
+  box-shadow: 0 0 10px rgba(255,77,141,.5);
 }
-@keyframes progress-shimmer {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
-}
+@keyframes pshimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
 /* ── SLIDE COUNTER ────────────────────────────────────────────── */
 .slide-counter {
-  position: fixed; right: 28px; bottom: 24px;
-  z-index: 90; color: var(--muted);
-  font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+  position: fixed; right: 28px; bottom: 24px; z-index: 90;
+  color: var(--muted); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
   font-variant-numeric: tabular-nums;
-  background: rgba(8,8,10,.6);
-  backdrop-filter: blur(12px);
-  padding: 6px 12px; border-radius: 999px;
-  border: 1px solid var(--line);
+  background: rgba(8,8,10,.7); backdrop-filter: blur(12px);
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
 }
 
 /* ── SLIDES ───────────────────────────────────────────────────── */
 .slide {
-  min-height: 100svh;
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  align-items: center;
+  min-height: 100svh; position: relative; isolation: isolate;
+  display: flex; align-items: center;
   padding: 96px clamp(20px,5vw,86px) 70px;
   border-bottom: 1px solid rgba(255,255,255,.04);
-  overflow: hidden;
+  overflow: hidden; /* prevents any inner overflow from escaping */
 }
-.slide-inner {
-  width: min(1500px,100%);
-  margin: 0 auto;
-}
+.slide-inner { width: min(1500px,100%); margin: 0 auto; }
 
 /* ── EYEBROW ─────────────────────────────────────────────────── */
 .eyebrow {
@@ -188,23 +121,15 @@ button { font: inherit; }
   text-transform: uppercase; letter-spacing: .16em;
   font-size: 12px; margin-bottom: 20px;
 }
-.eyebrow::before {
-  content: ""; flex-shrink: 0;
-  width: 24px; height: 2px;
-  background: currentColor; border-radius: 2px;
-}
+.eyebrow::before { content: ""; flex-shrink: 0; width: 24px; height: 2px; background: currentColor; border-radius: 2px; }
 
-/* ── TYPE SCALE ──────────────────────────────────────────────── */
+/* ── TYPOGRAPHY ──────────────────────────────────────────────── */
 h1, h2, h3, p { margin-top: 0; }
-h1, h2 {
-  font-weight: 820; letter-spacing: -.055em;
-  line-height: .93; text-wrap: balance;
-}
-h1 { font-size: clamp(52px,8.4vw,150px); max-width: 1050px; margin-bottom: 26px; }
-h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px; }
-.lede { font-size: clamp(17px,1.6vw,27px); line-height: 1.45; color: #c9c9ce; max-width: 850px; }
+h1, h2 { font-weight: 820; letter-spacing: -.055em; line-height: .93; text-wrap: balance; }
+h1 { font-size: clamp(48px,8.4vw,148px); max-width: 1050px; margin-bottom: 26px; }
+h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px; }
+.lede { font-size: clamp(16px,1.6vw,24px); line-height: 1.5; color: #c9c9ce; max-width: 780px; }
 
-/* ── GRADIENT TEXT ───────────────────────────────────────────── */
 .gradient-text {
   color: transparent;
   background: linear-gradient(90deg,#fff 0%,#fff 24%,var(--pink-soft) 63%,var(--blue) 100%);
@@ -214,420 +139,449 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
 /* ── LAYOUTS ─────────────────────────────────────────────────── */
 .grid-2 {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,.9fr);
-  gap: clamp(28px,7vw,110px);
-  align-items: center;
+  grid-template-columns: minmax(0,1fr) minmax(0,.95fr);
+  gap: clamp(28px,6vw,100px); align-items: center;
 }
 .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
 
-/* ── CARDS ───────────────────────────────────────────────────── */
+/* ── CARDS ─────────────────────────────────────────────────────
+   NO ::before pseudo with border-radius—that was the square bug.
+   Use box-shadow + background for glass effect instead.           */
 .card {
-  background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  background: linear-gradient(160deg, rgba(255,255,255,.075) 0%, rgba(255,255,255,.028) 100%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 26px;
-  box-shadow: inset 0 1px rgba(255,255,255,.06), 0 1px 2px rgba(0,0,0,.4);
-  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 2px 8px rgba(0,0,0,.35);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
   position: relative;
   overflow: hidden;
 }
-.card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: calc(var(--radius) + 1px);
-  background: linear-gradient(135deg, rgba(255,255,255,.08) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity .35s;
-  pointer-events: none;
+/* subtle inner highlight via inset gradient on the border */
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.1);
 }
-.card:hover { transform: translateY(-3px); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.1); }
-.card:hover::before { opacity: 1; }
 .card h3 { font-size: 22px; letter-spacing: -.03em; margin-bottom: 8px; }
 .card p { color: var(--muted); line-height: 1.5; margin: 0; }
 
 /* ── PILLS ───────────────────────────────────────────────────── */
 .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
 .pill {
-  border: 1px solid var(--line);
-  padding: 10px 16px; border-radius: 999px;
-  color: #d6d6da; font-size: 13px;
-  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px;
+  color: #d6d6da; font-size: 13px; background: rgba(255,255,255,.045);
   transition: background .2s, border-color .2s;
 }
 .pill:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); }
 
-/* ── PHONE STAGE (animated) ──────────────────────────────────── */
-.phone-stage {
-  position: relative; min-height: 620px;
-}
+/* ── PHONE STAGE ─────────────────────────────────────────────── */
+.phone-stage { position: relative; min-height: 620px; }
 .phone {
   position: absolute;
-  width: min(31vw, 330px);
-  aspect-ratio: 709/1536;
-  border-radius: 38px;
-  overflow: hidden;
-  background: #000;
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: var(--shadow);
-  transform-origin: center;
+  width: min(30vw, 320px); aspect-ratio: 709/1536;
+  border-radius: 38px; overflow: hidden;
+  background: #000; border: 1px solid rgba(255,255,255,.16);
+  box-shadow: var(--shadow); transform-origin: center;
   transition: transform .7s cubic-bezier(.2,.8,.2,1), box-shadow .7s ease;
   will-change: transform;
 }
 .phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.phone.a { left: 2%;   top: 15%; transform: rotate(-7deg); }
-.phone.b { left: 34%;  top: 2%;  z-index: 2; transform: translateY(-2%) scale(1.05); }
-.phone.c { right: 2%;  top: 17%; transform: rotate(7deg); }
-.phone-stage:hover .phone.a { transform: rotate(-11deg) translate(-12px,-10px) scale(1.02); box-shadow: 0 50px 120px rgba(0,0,0,.7); }
-.phone-stage:hover .phone.b { transform: translateY(-6%) scale(1.1); box-shadow: 0 60px 140px rgba(0,0,0,.8); }
-.phone-stage:hover .phone.c { transform: rotate(11deg) translate(12px,-10px) scale(1.02); box-shadow: 0 50px 120px rgba(0,0,0,.7); }
+.phone.a { left: 2%; top: 15%; transform: rotate(-7deg); }
+.phone.b { left: 34%; top: 2%; z-index: 2; transform: translateY(-2%) scale(1.05); }
+.phone.c { right: 2%; top: 17%; transform: rotate(7deg); }
+.phone-stage:hover .phone.a { transform: rotate(-11deg) translate(-12px,-10px); box-shadow: 0 60px 130px rgba(0,0,0,.7); }
+.phone-stage:hover .phone.b { transform: translateY(-6%) scale(1.1); box-shadow: 0 70px 150px rgba(0,0,0,.8); }
+.phone-stage:hover .phone.c { transform: rotate(11deg) translate(12px,-10px); box-shadow: 0 60px 130px rgba(0,0,0,.7); }
+@keyframes pf-a { 0%,100% { translate: 0 0; } 50% { translate: -4px 6px; } }
+@keyframes pf-b { 0%,100% { translate: 0 0; } 50% { translate: 2px -8px; } }
+@keyframes pf-c { 0%,100% { translate: 0 0; } 50% { translate: 5px 5px; } }
+.phone-stage:not(:hover) .phone.a { animation: pf-a 7s ease-in-out infinite; }
+.phone-stage:not(:hover) .phone.b { animation: pf-b 9s ease-in-out infinite; }
+.phone-stage:not(:hover) .phone.c { animation: pf-c 8s ease-in-out infinite; }
 
-/* levitating on idle */
-@keyframes phone-float-a { 0%,100% { translate: 0 0; } 50% { translate: -4px 6px; } }
-@keyframes phone-float-b { 0%,100% { translate: 0 0; } 50% { translate: 2px -8px; } }
-@keyframes phone-float-c { 0%,100% { translate: 0 0; } 50% { translate: 5px 5px; } }
-.phone-stage:not(:hover) .phone.a { animation: phone-float-a 7s ease-in-out infinite; }
-.phone-stage:not(:hover) .phone.b { animation: phone-float-b 9s ease-in-out infinite; }
-.phone-stage:not(:hover) .phone.c { animation: phone-float-c 8s ease-in-out infinite; }
-
-/* ── STATS STRIP ─────────────────────────────────────────────── */
+/* ── STAT STRIP ──────────────────────────────────────────────── */
 .stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 34px; }
-.stat {
-  padding: 18px 20px; border-radius: 20px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--line);
-  transition: background .3s;
-}
+.stat { padding: 18px 20px; border-radius: 20px; background: rgba(255,255,255,.04); border: 1px solid var(--line); transition: background .3s; }
 .stat:hover { background: rgba(255,255,255,.07); }
 .stat strong {
-  display: block;
-  font-size: clamp(24px,2.5vw,45px);
-  letter-spacing: -.04em;
-  background: linear-gradient(135deg, #fff, var(--muted));
+  display: block; font-size: clamp(22px,2.5vw,42px); letter-spacing: -.04em;
+  background: linear-gradient(135deg, #fff 20%, var(--muted));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .stat span { color: var(--muted); font-size: 13px; }
 
 /* ── PROBLEM STACK ───────────────────────────────────────────── */
 .problem-stack { display: grid; gap: 12px; margin-top: 28px; }
-.problem {
-  display: flex; gap: 15px; align-items: flex-start;
-  padding: 17px 0; border-top: 1px solid var(--line);
-}
-.problem i { width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; flex: 0 0 auto; }
+.problem { display: flex; gap: 15px; align-items: flex-start; padding: 17px 0; border-top: 1px solid var(--line); }
+.problem-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; flex: 0 0 auto; }
 .problem p { margin: 0; color: #d3d3d7; font-size: 18px; line-height: 1.45; }
 
-/* ── FLOW ────────────────────────────────────────────────────── */
-.flow { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-top: 48px; }
-.flow-step {
-  min-height: 180px; display: flex; flex-direction: column;
-  justify-content: space-between; position: relative; overflow: hidden;
-}
-.flow-step::after {
-  content: ""; position: absolute; right: -42px; bottom: -50px;
-  width: 120px; height: 120px; border-radius: 50%;
-  background: var(--tone); filter: blur(40px); opacity: .3;
-  transition: opacity .4s;
-}
-.flow-step:hover::after { opacity: .5; }
-.flow-step b { font-size: 13px; color: var(--tone); letter-spacing: .12em; text-transform: uppercase; }
-.flow-step strong { font-size: 24px; letter-spacing: -.04em; }
-
-/* ── SCOPE CARDS ─────────────────────────────────────────────── */
-.scope-card {
-  min-height: 260px; display: flex; flex-direction: column;
-  justify-content: space-between; overflow: hidden; position: relative;
-}
-.scope-card .num { font-size: 12px; color: var(--muted); letter-spacing: .18em; }
-.scope-card h3 { font-size: 32px; }
-.scope-card::before {
-  content: ""; position: absolute; inset: auto -60px -110px auto;
-  width: 230px; height: 230px; border-radius: 50%;
-  background: var(--tone); filter: blur(70px); opacity: .22;
-  transition: opacity .4s, transform .4s;
-}
-.scope-card:hover::before { opacity: .38; transform: scale(1.1); }
-
-/* ── MODE GRID ───────────────────────────────────────────────── */
-.mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 34px; }
-.mode-card strong { font-size: 48px; display: block; letter-spacing: -.05em; color: var(--tone); }
-.mode-card span   { color: #fff; font-size: 20px; font-weight: 730; }
-.mode-card p      { margin-top: 10px; }
-
 /* ── PHONE STATICS ───────────────────────────────────────────── */
-.dual-phones {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,360px));
-  justify-content: center;
-  gap: 28px;
-  align-items: end;
-}
-.triple-phones {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0,280px));
-  gap: 20px;
-  justify-content: center;
-  align-items: end;
-}
-.dual-phones .phone-static,
-.triple-phones .phone-static,
+.dual-phones { display: grid; grid-template-columns: repeat(2,minmax(0,360px)); justify-content: center; gap: 24px; align-items: end; }
+.triple-phones { display: grid; grid-template-columns: repeat(3,minmax(0,280px)); gap: 20px; justify-content: center; align-items: end; }
 .phone-static {
   border-radius: 34px; overflow: hidden;
   border: 1px solid rgba(255,255,255,.14);
-  box-shadow: var(--shadow);
-  background: #000;
+  box-shadow: var(--shadow); background: #000;
   transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease;
+  flex-shrink: 0;
 }
-.phone-static:hover {
-  transform: translateY(-8px) scale(1.01);
-  box-shadow: 0 60px 120px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.12);
-}
+.phone-static:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 60px 120px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.12); }
 .phone-static img { width: 100%; display: block; }
 
-/* ── FEATURE LIST ────────────────────────────────────────────── */
+/* ── FEATURE ROWS ────────────────────────────────────────────── */
 .feature-list { display: grid; gap: 16px; margin-top: 28px; }
-.feature-row {
-  display: grid; grid-template-columns: 44px 1fr;
-  gap: 14px; align-items: start;
-}
+.feature-row { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
 .feature-row .icon {
-  width: 44px; height: 44px; border-radius: 15px;
-  background: rgba(255,255,255,.07); display: grid;
-  place-items: center; color: var(--tone); font-weight: 900;
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(255,255,255,.06); display: grid; place-items: center;
+  color: var(--tone); font-weight: 900; font-size: 16px;
   border: 1px solid rgba(255,255,255,.08);
   transition: background .3s, transform .3s;
 }
-.feature-row:hover .icon { background: rgba(255,255,255,.12); transform: scale(1.08); }
+.feature-row:hover .icon { background: rgba(255,255,255,.11); transform: scale(1.08); }
 .feature-row h3 { font-size: 20px; margin: 1px 0 5px; }
-.feature-row p  { margin: 0; color: var(--muted); line-height: 1.5; }
-
-/* ── PIPELINE ────────────────────────────────────────────────── */
-.pipeline { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; margin-top: 44px; }
-.pipeline .card { min-height: 160px; }
-.pipeline .card b      { color: var(--tone); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
-.pipeline .card strong { display: block; margin-top: 34px; font-size: 22px; }
-
-/* animated connector lines between pipeline cards */
-.pipeline { position: relative; }
-.pipeline::after {
-  content: "";
-  position: absolute;
-  top: 50%; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--pink), var(--blue), var(--green), var(--amber), transparent);
-  z-index: -1;
-  opacity: .4;
-  pointer-events: none;
-}
+.feature-row p { margin: 0; color: var(--muted); line-height: 1.5; }
 
 /* ── TECH GRID ───────────────────────────────────────────────── */
 .tech-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 32px; }
 .tech { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end; }
-.tech b    { font-size: 18px; }
-.tech span { color: var(--muted); font-size: 13px; text-align: right; }
+.tech b { font-size: 18px; }
+.tech span { color: var(--muted); font-size: 13px; text-align: right; line-height: 1.4; }
 
-/* ── FRIENDS LAYOUT ──────────────────────────────────────────── */
-.friends-layout {
-  display: grid; grid-template-columns: .82fr 1.18fr;
-  gap: 28px; align-items: center;
+/* ── SCOPE CARDS ─────────────────────────────────────────────── */
+.scope-card {
+  min-height: 240px; display: flex; flex-direction: column;
+  justify-content: space-between; overflow: hidden; position: relative;
 }
-.friends-layout .visuals {
-  display: grid; grid-template-columns: .88fr 1.12fr;
-  gap: 18px; align-items: end;
+/* accent glow in corner — no border-radius bug, just a soft radial bg */
+.scope-card .scope-glow {
+  position: absolute; right: -40px; bottom: -80px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle at center, var(--tone) 0%, transparent 70%);
+  opacity: .18; pointer-events: none;
+  transition: opacity .4s;
 }
+.scope-card:hover .scope-glow { opacity: .3; }
+.scope-card .num { font-size: 12px; color: var(--muted); letter-spacing: .18em; }
+.scope-card h3 { font-size: 30px; }
+
+/* ── MODE CARDS ──────────────────────────────────────────────── */
+.mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 28px; }
+.mode-card strong { font-size: 46px; display: block; letter-spacing: -.05em; color: var(--tone); }
+.mode-card span { color: #fff; font-size: 18px; font-weight: 730; }
+.mode-card p { margin-top: 8px; }
 
 /* ── METRIC HERO ─────────────────────────────────────────────── */
 .metric-hero {
-  font-size: clamp(64px,12vw,205px);
-  font-weight: 850; letter-spacing: -.075em; line-height: .8;
+  font-size: clamp(60px,11vw,200px); font-weight: 850; letter-spacing: -.075em; line-height: .85;
   background: linear-gradient(135deg, #fff 30%, var(--pink-soft) 70%, var(--blue));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .metric-caption { color: var(--muted); font-size: 16px; margin-top: 18px; }
 
 /* ── BAR CHART ───────────────────────────────────────────────── */
-.bar-chart { display: grid; gap: 12px; margin-top: 38px; }
-.bar-row {
-  display: grid; grid-template-columns: 120px 1fr 70px;
-  gap: 13px; align-items: center; font-size: 13px; color: var(--muted);
-}
-.bar { height: 8px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
-.bar i {
-  display: block; height: 100%; width: 0;
-  background: linear-gradient(90deg, var(--pink), var(--blue));
-  border-radius: inherit;
-  transition: width 1.2s cubic-bezier(.2,.8,.2,1);
-}
+.bar-chart { display: grid; gap: 14px; margin-top: 36px; }
+.bar-row { display: grid; grid-template-columns: 110px 1fr 65px; gap: 12px; align-items: center; font-size: 13px; color: var(--muted); }
+.bar { height: 6px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--pink), var(--blue)); border-radius: inherit; transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
 .slide.is-visible .bar i { width: var(--w); }
 
 /* ── CTA ─────────────────────────────────────────────────────── */
 .cta {
   display: inline-flex; align-items: center; gap: 10px;
-  padding: 16px 28px; border-radius: 999px;
+  padding: 18px 32px; border-radius: 999px;
   background: linear-gradient(90deg, var(--pink), #fa7ca5);
-  color: #fff; font-weight: 800;
-  box-shadow: 0 14px 50px rgba(255,77,141,.3), 0 0 0 1px rgba(255,255,255,.08) inset;
+  color: #fff; font-weight: 800; font-size: 16px;
+  box-shadow: 0 12px 40px rgba(255,77,141,.28), inset 0 1px rgba(255,255,255,.2);
   margin-top: 28px;
-  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
   position: relative; overflow: hidden;
 }
 .cta::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.2) 50%, transparent 100%);
-  transform: translateX(-100%);
-  transition: transform .6s ease;
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%);
+  transform: translateX(-100%); transition: transform .6s ease;
 }
-.cta:hover { transform: translateY(-2px); box-shadow: 0 20px 70px rgba(255,77,141,.45), 0 0 0 1px rgba(255,255,255,.15) inset; }
+.cta:hover { transform: translateY(-2px); box-shadow: 0 20px 60px rgba(255,77,141,.42), inset 0 1px rgba(255,255,255,.2); }
 .cta:hover::after { transform: translateX(100%); }
 .cta:active { transform: translateY(0); }
 
 /* ── FOOTER NOTE ─────────────────────────────────────────────── */
-.footer-note {
-  position: absolute; left: clamp(20px,5vw,86px); bottom: 24px;
-  color: #55555e; font-size: 11px;
-}
+.footer-note { position: absolute; left: clamp(20px,5vw,86px); bottom: 24px; color: #48484e; font-size: 11px; }
 
 /* ── REVEAL ANIMATIONS ───────────────────────────────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1);
-}
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
 .slide.is-visible .reveal { opacity: 1; transform: none; }
-.delay-1  { transition-delay: .10s; }
-.delay-2  { transition-delay: .20s; }
-.delay-3  { transition-delay: .32s; }
-.delay-4  { transition-delay: .44s; }
-
-/* stagger children automatically */
-.flow .card:nth-child(1)  { transition-delay: .05s; }
-.flow .card:nth-child(2)  { transition-delay: .14s; }
-.flow .card:nth-child(3)  { transition-delay: .23s; }
-.flow .card:nth-child(4)  { transition-delay: .32s; }
-.flow .card:nth-child(5)  { transition-delay: .41s; }
+.delay-1 { transition-delay: .10s; }
+.delay-2 { transition-delay: .20s; }
+.delay-3 { transition-delay: .32s; }
+.delay-4 { transition-delay: .46s; }
 
 /* ── KICKER NUMBERS ──────────────────────────────────────────── */
 .kicker-number {
-  position: absolute; right: 4vw; top: 8vh;
-  font-size: min(24vw, 360px); font-weight: 900;
-  letter-spacing: -.08em; color: rgba(255,255,255,.022);
-  z-index: -1; pointer-events: none;
-  user-select: none;
-  transform: translateY(20px);
-  transition: transform 1.4s cubic-bezier(.2,.8,.2,1), opacity 1.4s;
-  opacity: 0;
+  position: absolute; right: 3vw; top: 8vh;
+  font-size: min(22vw,340px); font-weight: 900; letter-spacing: -.08em;
+  color: rgba(255,255,255,.022); z-index: -1; pointer-events: none; user-select: none;
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.2,.8,.2,1);
 }
-.slide.is-visible .kicker-number { transform: translateY(0); opacity: 1; }
+.slide.is-visible .kicker-number { opacity: 1; transform: translateY(0); }
 
-/* ── SCROLL SNAP (desktop only) ──────────────────────────────── */
+/* ── SCROLL SNAP ─────────────────────────────────────────────── */
 @media (min-width: 980px) {
   html, body { scroll-snap-type: y mandatory; }
   .slide { scroll-snap-align: start; scroll-snap-stop: always; }
 }
 
-/* ── RESPONSIVE: TABLET ──────────────────────────────────────── */
-@media (max-width: 1100px) {
-  .grid-2, .friends-layout { grid-template-columns: minmax(0,1fr); }
-  .phone-stage { min-height: 520px; }
-  .flow { grid-template-columns: repeat(3,1fr); }
-  .grid-3 { grid-template-columns: 1fr; }
-  .scope-card { min-height: 180px; }
-  .dual-phones {
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    max-width: 560px; margin: 0 auto;
-  }
-  .triple-phones {
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    max-width: 720px; margin: 0 auto;
-  }
+/* ══════════════════════════════════════════════════════════════
+   DIAGRAM COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── FLOW DIAGRAM (slide 3) ──────────────────────────────────── */
+.flow-diagram { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; margin-top: 52px; align-items: stretch; position: relative; }
+.flow-node {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 28px 20px; position: relative;
+}
+.flow-node::after { /* connector arrow */
+  content: ""; position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 10px solid rgba(255,255,255,.12);
+  z-index: 2;
+}
+.flow-node:last-child::after { display: none; }
+.flow-node-num { font-size: 11px; font-weight: 800; letter-spacing: .16em; color: var(--tone); text-transform: uppercase; }
+.flow-node-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; transition: transform .35s ease;
+}
+.flow-node:hover .flow-node-icon { transform: scale(1.1); }
+.flow-node-title { font-size: 20px; font-weight: 740; letter-spacing: -.03em; }
+.flow-node-desc { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
+.flow-node-accent {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--tone); border-radius: 0 0 0 0; opacity: .6;
+  transform: scaleX(0); transition: transform .5s cubic-bezier(.2,.8,.2,1);
+  transform-origin: left;
+}
+.slide.is-visible .flow-node-accent { transform: scaleX(1); }
+.flow-node:nth-child(1) .flow-node-accent { transition-delay: .1s; }
+.flow-node:nth-child(2) .flow-node-accent { transition-delay: .2s; }
+.flow-node:nth-child(3) .flow-node-accent { transition-delay: .3s; }
+.flow-node:nth-child(4) .flow-node-accent { transition-delay: .4s; }
+.flow-node:nth-child(5) .flow-node-accent { transition-delay: .5s; }
+
+/* ── SOCIAL SCOPE DIAGRAM (slide 4) ─────────────────────────── */
+.scope-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
+.scope-block {
+  border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+}
+.scope-block:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.scope-header { padding: 22px 22px 16px; position: relative; overflow: hidden; }
+.scope-header-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(var(--tone-rgb),.14) 0%, transparent 70%);
+}
+.scope-header-label { font-size: 11px; font-weight: 800; letter-spacing: .18em; color: var(--tone); text-transform: uppercase; position: relative; }
+.scope-header-name { font-size: 28px; font-weight: 820; letter-spacing: -.04em; position: relative; }
+.scope-body { padding: 18px 22px 22px; background: rgba(255,255,255,.025); }
+.scope-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+.scope-row:last-child { border-bottom: none; }
+.scope-badge { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--tone); }
+.scope-row span { font-size: 13px; color: #c8c8ce; line-height: 1.35; }
+
+/* ── SWIPE RUNTIME DIAGRAM (slide 5) ────────────────────────── */
+.runtime-diagram { display: grid; gap: 12px; margin-top: 36px; }
+.runtime-row { display: flex; gap: 12px; align-items: stretch; }
+.runtime-box {
+  flex: 1; padding: 18px 20px; border-radius: 18px;
+  border: 1px solid var(--line); background: rgba(255,255,255,.04);
+  position: relative; overflow: hidden;
+}
+.runtime-box-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); margin-bottom: 4px; }
+.runtime-box-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.runtime-box-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.runtime-arrow {
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.3); font-size: 18px; flex-shrink: 0; padding: 0 4px;
+}
+.runtime-connector {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; color: var(--muted); font-size: 12px;
+  padding: 8px 0;
+}
+.runtime-connector::before, .runtime-connector::after {
+  content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.1);
 }
 
-/* ── RESPONSIVE: MOBILE ──────────────────────────────────────── */
+/* ── PIPELINE (slide 8) ──────────────────────────────────────── */
+.pipeline { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 44px; align-items: stretch; position: relative; }
+.pipeline-step {
+  padding: 28px 22px; border: 1px solid var(--line); position: relative; overflow: hidden;
+  background: rgba(255,255,255,.03);
+  transition: background .3s;
+}
+.pipeline-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.pipeline-step:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+.pipeline-step + .pipeline-step { border-left: none; }
+.pipeline-step:hover { background: rgba(255,255,255,.055); }
+.pipeline-step-label {
+  font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--tone); margin-bottom: 20px;
+}
+.pipeline-step-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+.pipeline-step-title { font-size: 18px; font-weight: 740; margin-bottom: 8px; }
+.pipeline-step p { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
+.pipeline-step-arrow {
+  position: absolute; right: -13px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--muted); z-index: 3;
+}
+.pipeline-step:last-child .pipeline-step-arrow { display: none; }
+.pipeline-progress {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--tone); transform: scaleX(0); transform-origin: left;
+  transition: transform 1s cubic-bezier(.2,.8,.2,1);
+  opacity: .7;
+}
+.slide.is-visible .pipeline-progress { transform: scaleX(1); }
+.pipeline-step:nth-child(1) .pipeline-progress { transition-delay: .1s; }
+.pipeline-step:nth-child(2) .pipeline-progress { transition-delay: .25s; }
+.pipeline-step:nth-child(3) .pipeline-progress { transition-delay: .4s; }
+.pipeline-step:nth-child(4) .pipeline-progress { transition-delay: .55s; }
+
+/* ── ARCHITECTURE DIAGRAM (slide 9) ──────────────────────────── */
+.arch-diagram { margin-top: 36px; display: grid; gap: 10px; }
+.arch-layer { display: flex; gap: 10px; align-items: stretch; }
+.arch-block {
+  flex: 1; padding: 16px 18px; border-radius: 16px;
+  border: 1px solid var(--line); background: rgba(255,255,255,.04);
+  position: relative; overflow: hidden;
+}
+.arch-block-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); }
+.arch-block-name { font-size: 15px; font-weight: 700; margin-top: 4px; }
+.arch-block-detail { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.arch-divider {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .1em; text-transform: uppercase;
+}
+.arch-divider::before, .arch-divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+
+/* ── FRIENDS VOTE DIAGRAM (slide 10) ────────────────────────── */
+.vote-flow { display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr; gap: 0; align-items: center; margin-top: 36px; }
+.vote-phase {
+  border-radius: var(--radius); border: 1px solid var(--line); padding: 22px;
+  background: rgba(255,255,255,.04); position: relative; overflow: hidden;
+}
+.vote-phase-num { font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--tone); }
+.vote-phase-title { font-size: 20px; font-weight: 760; margin: 8px 0 10px; letter-spacing: -.03em; }
+.vote-phase-detail { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
+.vote-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.vote-tag {
+  padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
+}
+.vote-arrow { display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.25); font-size: 20px; }
+
+/* ── FRIENDS LAYOUT ──────────────────────────────────────────── */
+.friends-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 28px; align-items: center; }
+.friends-layout .visuals { display: grid; grid-template-columns: .88fr 1.12fr; gap: 18px; align-items: end; }
+
+/* ── CODE-OF-LAW DIAGRAM (slide 10 tie-breaker) ──────────────── */
+.tiebreak-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px; padding: 6px 14px; font-size: 13px; font-family: "SF Mono", monospace;
+  color: var(--green); margin-top: 14px;
+}
+
+/* ── CLOSE SLIDE LAYOUT ──────────────────────────────────────── */
+.close-layout { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
+.close-layout h2 { max-width: 900px; }
+.close-layout .lede { margin-left: auto; margin-right: auto; }
+.close-cta-row { display: flex; justify-content: center; margin-top: 28px; }
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ──────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .grid-2, .friends-layout { grid-template-columns: minmax(0,1fr); }
+  .phone-stage { min-height: 500px; }
+  .grid-3, .scope-grid { grid-template-columns: 1fr 1fr; }
+  .dual-phones { grid-template-columns: repeat(2,minmax(0,1fr)); max-width: 520px; margin: 0 auto; }
+  .triple-phones { grid-template-columns: repeat(3,minmax(0,1fr)); max-width: 680px; margin: 0 auto; }
+  .flow-diagram { grid-template-columns: repeat(3,1fr); }
+  .flow-node:nth-child(3)::after { display: none; }
+  .pipeline { grid-template-columns: repeat(2,1fr); }
+  .pipeline-step:nth-child(1) { border-radius: var(--radius) 0 0 0; }
+  .pipeline-step:nth-child(2) { border-radius: 0 var(--radius) 0 0; border-left: 1px solid var(--line); }
+  .pipeline-step:nth-child(3) { border-radius: 0 0 0 var(--radius); border-top: none; }
+  .pipeline-step:nth-child(4) { border-radius: 0 0 var(--radius) 0; border-top: none; border-left: 1px solid var(--line); }
+  .vote-flow { grid-template-columns: 1fr; gap: 10px; }
+  .vote-arrow { transform: rotate(90deg); }
+}
+
 @media (max-width: 700px) {
   .deck-nav { top: 12px; left: 12px; right: 12px; }
   .brand small { display: none; }
-
-  .slide { padding: 88px 16px 58px; align-items: flex-start; overflow: hidden; }
-
-  h1 { font-size: clamp(48px,16vw,80px); }
-  h2 { font-size: clamp(38px,12vw,64px); }
-  .lede { font-size: 17px; }
-
-  /* phone stage: smaller, all three visible */
-  .phone-stage { min-height: 460px; margin-top: 16px; width: 100%; }
-  .phone { width: 42vw; border-radius: 22px; }
-  .phone.a { left: 0;   top: 18%; }
-  .phone.b { left: 50%; top: 3%;  transform: translateX(-50%) scale(1.05); }
-  .phone.c { right: 0;  top: 22%; }
-  .phone-stage:hover .phone.a { transform: rotate(-8deg) translate(-6px,-6px); }
+  .slide { padding: 88px 16px 58px; overflow: hidden; }
+  h1 { font-size: clamp(44px,15vw,76px); }
+  h2 { font-size: clamp(34px,11vw,60px); }
+  .lede { font-size: 16px; }
+  .phone-stage { min-height: 440px; margin-top: 16px; width: 100%; }
+  .phone { width: 40vw; border-radius: 22px; }
+  .phone.a { left: 0; top: 18%; }
+  .phone.b { left: 50%; top: 3%; transform: translateX(-50%) scale(1.05); }
+  .phone.c { right: 0; top: 22%; }
   .phone-stage:hover .phone.b { transform: translateX(-50%) translateY(-5%) scale(1.08); }
-  .phone-stage:hover .phone.c { transform: rotate(8deg) translate(6px,-6px); }
-
   .stat-strip { grid-template-columns: repeat(2,1fr); }
-  .flow        { grid-template-columns: 1fr; }
-  .mode-grid   { grid-template-columns: 1fr; }
-  .pipeline    { grid-template-columns: 1fr; }
-  .tech-grid   { grid-template-columns: 1fr; }
-  .friends-layout .visuals { gap: 10px; }
-
-  .dual-phones {
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 10px; max-width: 100%;
-  }
-  .triple-phones {
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    gap: 7px; max-width: 100%;
-  }
-  .dual-phones .phone-static,
-  .triple-phones .phone-static,
+  .grid-3, .scope-grid { grid-template-columns: 1fr; }
+  .mode-grid { grid-template-columns: 1fr; }
+  .flow-diagram { grid-template-columns: 1fr; }
+  .flow-node::after { display: none; }
+  .flow-node-accent { display: none; }
+  .pipeline { grid-template-columns: 1fr; }
+  .pipeline-step { border-radius: 0 !important; border-left: 1px solid var(--line) !important; border-top: none; }
+  .pipeline-step:first-child { border-radius: var(--radius) var(--radius) 0 0 !important; border-top: 1px solid var(--line) !important; }
+  .pipeline-step:last-child  { border-radius: 0 0 var(--radius) var(--radius) !important; }
+  .dual-phones { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; max-width: 100%; overflow: hidden; }
+  .triple-phones { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; max-width: 100%; overflow: hidden; }
   .phone-static { border-radius: 18px; }
-  /* prevent any stray overflow */
-  .dual-phones,
-  .triple-phones { overflow: hidden; }
-
+  .friends-layout { grid-template-columns: 1fr; }
+  .friends-layout .visuals { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 80px 1fr 54px; gap: 8px; }
+  .metric-hero { font-size: clamp(50px,18vw,110px); }
+  .kicker-number { font-size: min(36vw,180px); }
+  .runtime-row { flex-direction: column; }
+  .runtime-arrow { transform: rotate(90deg); }
+  .arch-layer { flex-direction: column; }
   .slide-counter { right: 14px; bottom: 12px; }
-  .flow-step     { min-height: 130px; }
-  .bar-row { grid-template-columns: 90px 1fr 58px; gap: 8px; }
-  .metric-hero { font-size: clamp(56px,20vw,120px); }
-  .kicker-number { font-size: min(40vw,200px); }
-  .pipeline::after { display: none; }
+  .vote-flow { grid-template-columns: 1fr; gap: 10px; }
 }
 
-/* ── REDUCED MOTION ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation: none !important;
-    transition-duration: .01ms !important;
-  }
+  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .slide.is-visible .kicker-number { opacity: 1; transform: none; }
+  .slide.is-visible .kicker-number { opacity: 1; }
 }
-
-/* ── PRINT ───────────────────────────────────────────────────── */
 @media print {
   .deck-nav, .progress, .slide-counter { display: none !important; }
   .slide { page-break-after: always; min-height: 100vh; padding: 50px; overflow: visible; }
   body { background: #050506 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
-
-/* ── SHIMMER UTILITY (for pipeline/card hover) ───────────────── */
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-.card-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.06) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2.5s infinite;
-  border-radius: inherit;
-}
 </style>
 </head>
 <body>
 
-<!-- ambient orbs -->
 <div class="ambient-orbs" aria-hidden="true">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
@@ -647,17 +601,16 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
     <button id="fs"   aria-label="Vollbild">⛶</button>
   </div>
 </nav>
-
 <div class="slide-counter"><span id="current">01</span> / 12</div>
 
-<!-- ── 01 INTRO ────────────────────────────────────────────── -->
+<!-- ── 01 INTRO ─────────────────────────────────────────────── -->
 <section class="slide" id="slide-1" data-title="Intro">
   <div class="kicker-number">01</div>
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Pitchdeck · App Store Launch</div>
       <h1 class="reveal delay-1">Was essen wir <span class="gradient-text">heute?</span></h1>
-      <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen, konsequenten Produktfluss.</p>
+      <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen, konsequenten Produktfluss — lokal auf dem Gerät, oder live im Haushalt.</p>
       <div class="pill-row reveal delay-3">
         <span class="pill">Local-first</span>
         <span class="pill">Cloud, wo Zusammenarbeit beginnt</span>
@@ -672,18 +625,18 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 02 PROBLEM ──────────────────────────────────────────── -->
+<!-- ── 02 PROBLEM ────────────────────────────────────────────── -->
 <section class="slide" id="slide-2" data-title="Problem">
   <div class="kicker-number">02</div>
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Ausgangsproblem</div>
       <h2 class="reveal delay-1">Der letzte Meter beim Kochen ist kaputt.</h2>
-      <p class="lede reveal delay-2">Rezepte sind überall. Entscheidungen dauern. Planung passiert im Kopf. Einkauf und Kochen sind dann wieder separate Werkzeuge.</p>
+      <p class="lede reveal delay-2">Rezepte sind überall. Entscheidungen dauern. Planung passiert im Kopf. Einkauf und Kochen sind separate Werkzeuge — und keine Entscheidung ist wirklich gemeinsam.</p>
       <div class="problem-stack reveal delay-3">
-        <div class="problem"><i style="background:var(--pink)"></i><p>Rezepte verschwinden in Chats, Browser-Tabs, Screenshots und PDFs.</p></div>
-        <div class="problem"><i style="background:var(--blue)"></i><p>Ein Like ist noch keine gemeinsame Entscheidung.</p></div>
-        <div class="problem"><i style="background:var(--green)"></i><p>Nach der Entscheidung beginnt die eigentliche Arbeit erst.</p></div>
+        <div class="problem"><div class="problem-dot" style="background:var(--pink)"></div><p>Rezepte verschwinden in Chats, Browser-Tabs, Screenshots und PDFs — ohne Struktur, ohne Wiederfindbarkeit.</p></div>
+        <div class="problem"><div class="problem-dot" style="background:var(--blue)"></div><p>Ein Like ist noch keine gemeinsame Entscheidung. WhatsApp-Abstimmungen enden im Chaos.</p></div>
+        <div class="problem"><div class="problem-dot" style="background:var(--green)"></div><p>Nach der Entscheidung beginnt die eigentliche Arbeit erst: Einkaufsliste, Zutaten, Kochen — alles von vorne.</p></div>
       </div>
     </div>
     <div class="dual-phones reveal delay-2">
@@ -693,53 +646,170 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 03 FLOW ─────────────────────────────────────────────── -->
+<!-- ── 03 FLOW ───────────────────────────────────────────────── -->
 <section class="slide" id="slide-3" data-title="Flow">
   <div class="kicker-number">03</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Produktfluss</div>
     <h2 class="reveal delay-1">Nicht noch eine Rezept-App.<br>Ein geschlossener Kreislauf.</h2>
-    <div class="flow">
-      <div class="card flow-step reveal" style="--tone:var(--pink)"><b>01</b><strong>Import</strong><p>Kamera, PDF, Web &amp; Share</p></div>
-      <div class="card flow-step reveal" style="--tone:var(--blue)"><b>02</b><strong>Kochbuch</strong><p>Suchen, sammeln, entdecken</p></div>
-      <div class="card flow-step reveal" style="--tone:var(--green)"><b>03</b><strong>Entscheiden</strong><p>Quick, Woche, Endlos, Friends</p></div>
-      <div class="card flow-step reveal" style="--tone:var(--amber)"><b>04</b><strong>Planen</strong><p>Woche, Monat, Einkauf</p></div>
-      <div class="card flow-step reveal" style="--tone:var(--pink-soft)"><b>05</b><strong>Kochen</strong><p>Schritt für Schritt bis fertig</p></div>
+    <p class="lede reveal delay-2">Fünf Stationen — eine durchgängige Nutzererfahrung ohne Medienbruch.</p>
+    <div class="flow-diagram reveal delay-3">
+      <div class="card flow-node" style="--tone:var(--pink)">
+        <div class="flow-node-accent"></div>
+        <div class="flow-node-num">01</div>
+        <div class="flow-node-icon">📷</div>
+        <div class="flow-node-title">Import</div>
+        <p class="flow-node-desc">Kamera, PDF, Web-Share oder Action-Extension — Vision OCR + Foundation Models.</p>
+      </div>
+      <div class="card flow-node" style="--tone:var(--blue)">
+        <div class="flow-node-accent"></div>
+        <div class="flow-node-num">02</div>
+        <div class="flow-node-icon">📚</div>
+        <div class="flow-node-title">Kochbuch</div>
+        <p class="flow-node-desc">Strukturierte Alben, Hero-Karussell, tägliche Entdeckungen — SwiftData on-device.</p>
+      </div>
+      <div class="card flow-node" style="--tone:var(--green)">
+        <div class="flow-node-accent"></div>
+        <div class="flow-node-num">03</div>
+        <div class="flow-node-icon">♠</div>
+        <div class="flow-node-title">Entscheiden</div>
+        <p class="flow-node-desc">Quick · Woche · Endlos · Friends — drei soziale Scopes, ein Swipe-Erlebnis.</p>
+      </div>
+      <div class="card flow-node" style="--tone:var(--amber)">
+        <div class="flow-node-accent"></div>
+        <div class="flow-node-num">04</div>
+        <div class="flow-node-icon">📅</div>
+        <div class="flow-node-title">Planen</div>
+        <p class="flow-node-desc">Matches landen direkt im Wochenplan. Einkaufsliste dedupliziert und kategorisiert.</p>
+      </div>
+      <div class="card flow-node" style="--tone:var(--pink-soft)">
+        <div class="flow-node-accent"></div>
+        <div class="flow-node-num">05</div>
+        <div class="flow-node-icon">🍳</div>
+        <div class="flow-node-title">Kochen</div>
+        <p class="flow-node-desc">Step-by-Step Begleitung, Timer, Live Activity in Dynamic Island und Sperrbildschirm.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── 04 SCOPES ───────────────────────────────────────────── -->
+<!-- ── 04 SCOPES ─────────────────────────────────────────────── -->
 <section class="slide" id="slide-4" data-title="Scopes">
   <div class="kicker-number">04</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Entscheidungszentrale</div>
-    <h2 class="reveal delay-1">Drei soziale Scopes.<br>Drei klare Modi.</h2>
-    <div class="grid-3" style="margin-top:36px">
-      <article class="card scope-card reveal"         style="--tone:var(--blue)"> <span class="num">01 · DEVICE</span>    <div><h3>Lokal</h3>    <p>Geräteinterne Personenprofile, SwiftData und ein gemeinsamer Plan.</p></div></article>
-      <article class="card scope-card reveal delay-1" style="--tone:var(--pink)"> <span class="num">02 · HOUSEHOLD</span> <div><h3>Familie</h3>  <p>Dauerhafter Haushalt mit Auth, Echtzeit-Reaktionen und Cloud-Plan.</p></div></article>
-      <article class="card scope-card reveal delay-2" style="--tone:var(--green)"><span class="num">03 · EVENT</span>    <div><h3>Freunde</h3>  <p>Temporäre Gruppenrunde mit Invite-Token, zwei Phasen und gebündelten Ballots.</p></div></article>
+    <h2 class="reveal delay-1">Drei soziale Scopes.<br>Drei klare Abstimmungsmodi.</h2>
+
+    <div class="scope-grid reveal delay-2">
+      <!-- Local -->
+      <div class="scope-block" style="--tone:var(--blue); --tone-rgb:35,184,245">
+        <div class="scope-header">
+          <div class="scope-header-bg"></div>
+          <div class="scope-header-label">01 · Device</div>
+          <div class="scope-header-name">Lokal</div>
+        </div>
+        <div class="scope-body">
+          <div class="scope-row"><div class="scope-badge"></div><span>Geräteinterne Personenprofile</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>SwiftData · kein Account nötig</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Gemeinsamer Plan auf dem Gerät</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Likes bleiben personengebunden</span></div>
+        </div>
+      </div>
+      <!-- Family -->
+      <div class="scope-block" style="--tone:var(--pink); --tone-rgb:255,77,141">
+        <div class="scope-header">
+          <div class="scope-header-bg"></div>
+          <div class="scope-header-label">02 · Household</div>
+          <div class="scope-header-name">Familie</div>
+        </div>
+        <div class="scope-body">
+          <div class="scope-row"><div class="scope-badge"></div><span>Dauerhafter Haushalt via Firestore</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Echtzeit-Reaktionen · optimistisch</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Match = 2 × Like → Cloud-Plan</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Einkaufsliste live synchronisiert</span></div>
+        </div>
+      </div>
+      <!-- Friends -->
+      <div class="scope-block" style="--tone:var(--green); --tone-rgb:131,216,173">
+        <div class="scope-header">
+          <div class="scope-header-bg"></div>
+          <div class="scope-header-label">03 · Event</div>
+          <div class="scope-header-name">Freunde</div>
+        </div>
+        <div class="scope-body">
+          <div class="scope-row"><div class="scope-badge"></div><span>Temporäre Gruppenrunde</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Invite per Deep-Link Token</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Zweiphasiger Abstimmungsablauf</span></div>
+          <div class="scope-row"><div class="scope-badge"></div><span>Deterministischer Tie-Breaker</span></div>
+        </div>
+      </div>
     </div>
-    <div class="mode-grid">
-      <div class="card mode-card reveal"         style="--tone:var(--blue)"> <strong>7</strong>  <span>Jetzt schnell</span> <p>Der erste Match gewinnt.</p></div>
-      <div class="card mode-card reveal delay-1" style="--tone:var(--pink)"> <strong>20</strong> <span>Woche planen</span>  <p>Begrenzte Runde mit Planwirkung.</p></div>
-      <div class="card mode-card reveal delay-2" style="--tone:var(--green)"><strong>∞</strong>  <span>Endlos</span>       <p>Geschmack lernen, ohne Planwrite.</p></div>
+
+    <div class="mode-grid reveal delay-3">
+      <div class="card mode-card" style="--tone:var(--blue)">
+        <strong>7</strong><span>Jetzt schnell</span>
+        <p class="card p">Erster Match belegt sofort den Tag — Session endet.</p>
+      </div>
+      <div class="card mode-card" style="--tone:var(--pink)">
+        <strong>20</strong><span>Woche planen</span>
+        <p class="card p">Matches füllen freie Wochentage bis die Zieltage belegt sind.</p>
+      </div>
+      <div class="card mode-card" style="--tone:var(--green)">
+        <strong>∞</strong><span>Endlos</span>
+        <p class="card p">Geschmack sammeln — kein automatischer Planwrite.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── 05 DECISION ENGINE ──────────────────────────────────── -->
+<!-- ── 05 DECISION ENGINE ─────────────────────────────────────── -->
 <section class="slide" id="slide-5" data-title="Decision Engine">
   <div class="kicker-number">05</div>
   <div class="slide-inner grid-2">
     <div>
-      <div class="eyebrow reveal">Produktlogik</div>
+      <div class="eyebrow reveal">Matchlogik & Runtime</div>
       <h2 class="reveal delay-1">Ein Like ist noch kein Abendessen.</h2>
-      <p class="lede reveal delay-2">Envie schützt den Wochenplan vor Zufallstreffern. Einzelne Likes bleiben Freigaben. Erst planrelevante gemeinsame Treffer werden zur Handlung.</p>
-      <div class="feature-list reveal delay-3">
-        <div class="feature-row" style="--tone:var(--pink)"> <div class="icon">♥</div>  <div><h3>Solo-Like</h3><p>Speichert Zustimmung, erzeugt aber keinen Plan-Eintrag.</p></div></div>
-        <div class="feature-row" style="--tone:var(--blue)"> <div class="icon">×2</div> <div><h3>Match</h3><p>Wird im passenden Kontext einmalig und idempotent verarbeitet.</p></div></div>
-        <div class="feature-row" style="--tone:var(--green)"><div class="icon">↺</div>  <div><h3>Kontext bleibt sauber</h3><p>Quick, Woche, Endlos, Family und Friends vermischen ihre Wahrheit nicht.</p></div></div>
+      <p class="lede reveal delay-2">Envie trennt Zustimmung von Planwirkung. Erst ein kontextuell gültiger gemeinsamer Treffer wird transaktionssicher in den Wochenplan geschrieben.</p>
+
+      <div class="runtime-diagram reveal delay-3">
+        <div class="runtime-row">
+          <div class="runtime-box" style="--tone:var(--pink)">
+            <div class="runtime-box-label">UI-Shell</div>
+            <div class="runtime-box-name">SwipeView</div>
+            <div class="runtime-box-desc">Gesten · Haptik · Card Stack</div>
+          </div>
+          <div class="runtime-arrow">→</div>
+          <div class="runtime-box" style="--tone:var(--blue)">
+            <div class="runtime-box-label">Coordinator</div>
+            <div class="runtime-box-name">SwipeViewModel</div>
+            <div class="runtime-box-desc">Stack · Session · Reaktionen</div>
+          </div>
+        </div>
+        <div class="runtime-connector">SwipeResult-Pipeline</div>
+        <div class="runtime-row">
+          <div class="runtime-box" style="--tone:var(--green)">
+            <div class="runtime-box-label">Local</div>
+            <div class="runtime-box-name">SwiftData Writer</div>
+            <div class="runtime-box-desc">Solo-Like · Match lokal</div>
+          </div>
+          <div class="runtime-arrow">→</div>
+          <div class="runtime-box" style="--tone:var(--amber)">
+            <div class="runtime-box-label">Cloud</div>
+            <div class="runtime-box-name">FamilyMatchCoordinator</div>
+            <div class="runtime-box-desc">Transaktionaler Claim · idempotent</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list reveal delay-4">
+        <div class="feature-row" style="--tone:var(--pink)">
+          <div class="icon">♥</div>
+          <div><h3>Solo-Like</h3><p>Personengebundene Freigabe — kein Plan-Eintrag.</p></div>
+        </div>
+        <div class="feature-row" style="--tone:var(--green)">
+          <div class="icon">×2</div>
+          <div><h3>Match</h3><p>Quick / Woche / Family / Friends — jeder Kontext hat eigene Planlogik.</p></div>
+        </div>
       </div>
     </div>
     <div class="dual-phones reveal delay-2">
@@ -749,13 +819,13 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 06 PLAN ─────────────────────────────────────────────── -->
+<!-- ── 06 PLAN ───────────────────────────────────────────────── -->
 <section class="slide" id="slide-6" data-title="Plan">
   <div class="kicker-number">06</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Planungsmaschine</div>
     <h2 class="reveal delay-1">Aus Entscheidungen wird Einkauf.</h2>
-    <p class="lede reveal delay-2">Woche, Monat und Einkaufsliste sind keine Zusatzmodule, sondern die direkte Fortsetzung der Entscheidung.</p>
+    <p class="lede reveal delay-2">Woche, Monat und Einkaufsliste sind keine Zusatzmodule — sondern die direkte Fortsetzung der Entscheidung. Zutaten werden dedupliziert, Supermarktkategorien zugeordnet, Family-Haken in Echtzeit synchronisiert.</p>
     <div class="triple-phones reveal delay-3" style="margin-top:36px">
       <div class="phone-static"><img src="assets/weekplan.webp" alt="Wochenplan"></div>
       <div class="phone-static" style="transform:translateY(-30px)"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
@@ -764,19 +834,19 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 07 COOKING ──────────────────────────────────────────── -->
+<!-- ── 07 COOKING ────────────────────────────────────────────── -->
 <section class="slide" id="slide-7" data-title="Cooking">
   <div class="kicker-number">07</div>
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Kochmodus</div>
       <h2 class="reveal delay-1">Am Herd zählt Ruhe,<br>nicht Feature-Lärm.</h2>
-      <p class="lede reveal delay-2">Große Schritte, persistierter Zustand und Timer mit Live Activity machen aus dem Plan eine echte Kochbegleitung.</p>
+      <p class="lede reveal delay-2">Großformatige Schritt-für-Schritt-Karten, persistierter Kochstand und Live Activity im Dynamic Island — der Kochmodus verschwindet im Hintergrund, nicht im Weg.</p>
       <div class="tech-grid reveal delay-3">
-        <div class="card tech"><b>Step-by-step</b><span>große Karten<br>klare Priorität</span></div>
-        <div class="card tech"><b>Persistenz</b><span>aktueller Schritt<br>bleibt erhalten</span></div>
-        <div class="card tech"><b>Timer</b><span>Endzeit statt<br>fragiler Countdown</span></div>
-        <div class="card tech"><b>System UI</b><span>Dynamic Island<br>Live Activity</span></div>
+        <div class="card tech"><b>Step-by-step</b><span>Fokus-UI mit Zutatenzoom per Schritt</span></div>
+        <div class="card tech"><b>Persistenz</b><span>CookingManager speichert aktiven Schritt</span></div>
+        <div class="card tech"><b>Timer</b><span>Endzeit statt fragilem Countdown</span></div>
+        <div class="card tech"><b>Dynamic Island</b><span>LiveActivityManager · Sperrbildschirm</span></div>
       </div>
     </div>
     <div class="dual-phones reveal delay-2" style="grid-template-columns:minmax(0,390px)">
@@ -785,35 +855,90 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 08 AI IMPORT ────────────────────────────────────────── -->
+<!-- ── 08 AI IMPORT ──────────────────────────────────────────── -->
 <section class="slide" id="slide-8" data-title="AI Import">
   <div class="kicker-number">08</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Import als Wettbewerbsvorteil</div>
-    <h2 class="reveal delay-1">Der Import macht Envie erst dauerhaft wertvoll.</h2>
-    <p class="lede reveal delay-2">Rezepte werden nicht nur gespeichert, sondern strukturiert: Vision-OCR liest, Apple Foundation Models ordnen, die Review-Ansicht hält den Nutzer in Kontrolle.</p>
-    <div class="pipeline">
-      <div class="card reveal"         style="--tone:var(--pink)"> <b>Input</b>    <strong>Kamera · PDF · Web</strong>    <p>Share- und Action-Extension inklusive.</p></div>
-      <div class="card reveal delay-1" style="--tone:var(--blue)"> <b>Read</b>     <strong>Apple Vision OCR</strong>       <p>Texterkennung direkt auf dem Gerät.</p></div>
-      <div class="card reveal delay-2" style="--tone:var(--green)"><b>Structure</b><strong>Foundation Models</strong>       <p>Zutaten, Schritte und Metadaten.</p></div>
-      <div class="card reveal delay-3" style="--tone:var(--amber)"><b>Control</b>  <strong>Review &amp; Save</strong>      <p>Prüfen, korrigieren, lokal sichern.</p></div>
+    <h2 class="reveal delay-1">Jede Quelle.<br>Ein strukturiertes Rezept.</h2>
+    <p class="lede reveal delay-2">Vision-OCR liest, Apple Foundation Models ordnen, die Review-Ansicht hält den Nutzer in Kontrolle — vollständig on-device, keine Cloud-API, keine Kosten pro Import.</p>
+
+    <div class="pipeline reveal delay-3">
+      <div class="pipeline-step" style="--tone:var(--pink)">
+        <div class="pipeline-progress"></div>
+        <div class="pipeline-step-label">Input</div>
+        <span class="pipeline-step-icon">📷</span>
+        <div class="pipeline-step-title">Kamera · PDF · Web</div>
+        <p>Share- und Action-Extension. Jede Quelle, die iOS kennt.</p>
+        <div class="pipeline-step-arrow">›</div>
+      </div>
+      <div class="pipeline-step" style="--tone:var(--blue)">
+        <div class="pipeline-progress"></div>
+        <div class="pipeline-step-label">Read</div>
+        <span class="pipeline-step-icon">🔍</span>
+        <div class="pipeline-step-title">Apple Vision OCR</div>
+        <p>Texterkennung direkt auf dem Gerät. JSON-LD-Parser für Web-Shares.</p>
+        <div class="pipeline-step-arrow">›</div>
+      </div>
+      <div class="pipeline-step" style="--tone:var(--green)">
+        <div class="pipeline-progress"></div>
+        <div class="pipeline-step-label">Structure</div>
+        <span class="pipeline-step-icon">🧠</span>
+        <div class="pipeline-step-title">Foundation Models</div>
+        <p>On-device Apple Intelligence: Zutaten, Schritte, Metadaten. Regex-Fallback.</p>
+        <div class="pipeline-step-arrow">›</div>
+      </div>
+      <div class="pipeline-step" style="--tone:var(--amber)">
+        <div class="pipeline-progress"></div>
+        <div class="pipeline-step-label">Control</div>
+        <span class="pipeline-step-icon">✅</span>
+        <div class="pipeline-step-title">Review &amp; Save</div>
+        <p>ImportReviewView: prüfen, korrigieren, lokal in SwiftData sichern.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── 09 ARCHITECTURE ─────────────────────────────────────── -->
+<!-- ── 09 ARCHITECTURE ───────────────────────────────────────── -->
 <section class="slide" id="slide-9" data-title="Architecture">
   <div class="kicker-number">09</div>
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Architektur</div>
       <h2 class="reveal delay-1">Local-first.<br>Cloud, wo Zusammenarbeit entsteht.</h2>
-      <p class="lede reveal delay-2">Die App bleibt ohne Konto nutzbar. Firebase wird gezielt für Haushalt und Freundesrunden eingesetzt – mit getrennten Daten- und Reaktionsmodellen.</p>
-      <div class="tech-grid reveal delay-3">
-        <div class="card tech"><b style="color:var(--pink)">SwiftData</b><span>Rezepte · Profile<br>Plan · Cooking State</span></div>
-        <div class="card tech"><b style="color:var(--blue)">Firebase Auth</b><span>anonym · Google<br>Apple vorbereitet</span></div>
-        <div class="card tech"><b style="color:var(--green)">Firestore</b><span>Household · Friends<br>Claims · Submissions</span></div>
-        <div class="card tech"><b style="color:var(--amber)">Apple APIs</b><span>Vision · Foundation Models<br>ActivityKit · Reminders</span></div>
+      <p class="lede reveal delay-2">Kein Account für die Basisnutzung. Firebase greift erst bei Haushalt oder Freundesrunden — mit getrennten Daten- und Reaktionspfaden.</p>
+
+      <div class="arch-diagram reveal delay-3">
+        <div class="arch-layer">
+          <div class="arch-block" style="--tone:var(--pink)">
+            <div class="arch-block-label">On-device</div>
+            <div class="arch-block-name">SwiftData</div>
+            <div class="arch-block-detail">Dish · WeekPlan · DecisionSession · Person</div>
+          </div>
+          <div class="arch-block" style="--tone:var(--pink-soft)">
+            <div class="arch-block-label">AI</div>
+            <div class="arch-block-name">Apple Foundation Models</div>
+            <div class="arch-block-detail">RecipeAIService · Vision OCR</div>
+          </div>
+        </div>
+        <div class="arch-divider">Cloud-Schicht — nur bei Kollaboration</div>
+        <div class="arch-layer">
+          <div class="arch-block" style="--tone:var(--blue)">
+            <div class="arch-block-label">Auth</div>
+            <div class="arch-block-name">Firebase Auth</div>
+            <div class="arch-block-detail">Anonym · Google · Apple (vorbereitet)</div>
+          </div>
+          <div class="arch-block" style="--tone:var(--green)">
+            <div class="arch-block-label">Sync</div>
+            <div class="arch-block-name">Firestore</div>
+            <div class="arch-block-detail">Household · reactionStates/{uid} · FriendRound · Claims</div>
+          </div>
+          <div class="arch-block" style="--tone:var(--amber)">
+            <div class="arch-block-label">Security</div>
+            <div class="arch-block-name">App Check</div>
+            <div class="arch-block-detail">App Attest · DeviceCheck · Pre-Release Enforcement</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="dual-phones reveal delay-2">
@@ -823,66 +948,85 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
   </div>
 </section>
 
-<!-- ── 10 FRIENDS ──────────────────────────────────────────── -->
+<!-- ── 10 FRIENDS ────────────────────────────────────────────── -->
 <section class="slide" id="slide-10" data-title="Friends">
   <div class="kicker-number">10</div>
-  <div class="slide-inner friends-layout">
-    <div>
-      <div class="eyebrow reveal">Friends Mode</div>
-      <h2 class="reveal delay-1">Keine Chat-Abstimmung.<br>Eine gehostete Entscheidung.</h2>
-      <p class="lede reveal delay-2">Temporäre Gruppenrunde, sichere Invite-Tokens, gebündelte Ballots und ein zweiphasiger Ablauf statt Live-Reaction-Lärm.</p>
-      <div class="feature-list reveal delay-3">
-        <div class="feature-row" style="--tone:var(--pink)"> <div class="icon">1</div> <div><h3>Vorauswahl</h3>              <p>Nominieren oder Veto im 2×3 Raster.</p></div></div>
-        <div class="feature-row" style="--tone:var(--blue)"> <div class="icon">2</div> <div><h3>Finalrunde</h3>              <p>Like oder Pass für die Shortlist.</p></div></div>
-        <div class="feature-row" style="--tone:var(--green)"><div class="icon">✓</div> <div><h3>Deterministisches Ergebnis</h3><p>Seed-basierte Tie-Breaker, cloudseitige Lifecycle-Claims.</p></div></div>
+  <div class="slide-inner">
+    <div class="eyebrow reveal">Friends Mode</div>
+    <h2 class="reveal delay-1">Keine Chat-Abstimmung.<br>Eine gehostete Entscheidung.</h2>
+
+    <div class="vote-flow reveal delay-2">
+      <div class="vote-phase" style="--tone:var(--pink)">
+        <div class="vote-phase-num">Phase 1 · Nominierung &amp; Veto</div>
+        <div class="vote-phase-title">2×3 Grid-Abstimmung</div>
+        <p class="vote-phase-detail">Jeder Teilnehmer bewertet Stacks im Grid. Like = nominiert. Veto = für alle gesperrt. Ballots werden gebündelt an Firestore übertragen.</p>
+        <div class="vote-actions">
+          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
+          <span class="vote-tag" style="color:var(--pink)">✗ Veto</span>
+          <span class="vote-tag" style="color:var(--muted)">→ Weitergabe</span>
+        </div>
       </div>
-    </div>
-    <div class="visuals reveal delay-2">
-      <div class="phone-static"><img src="assets/friends_home.webp" alt="Friends Dashboard"></div>
-      <div class="phone-static" style="transform:translateY(-35px)"><img src="assets/friends_vote.webp" alt="Friends Voting Grid"></div>
+      <div class="vote-arrow">→</div>
+      <div class="vote-phase" style="--tone:var(--blue)">
+        <div class="vote-phase-num">Phase 2 · Finalrunde</div>
+        <div class="vote-phase-title">Klassischer Swipe</div>
+        <p class="vote-phase-detail">Verbliebene Finalisten aus Phase 1 im gewohnten Swipe-Format. Like oder Pass — schnell und eindeutig.</p>
+        <div class="vote-actions">
+          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
+          <span class="vote-tag" style="color:var(--muted)">✗ Pass</span>
+        </div>
+      </div>
+      <div class="vote-arrow">→</div>
+      <div class="vote-phase" style="--tone:var(--green)">
+        <div class="vote-phase-num">Ergebnis</div>
+        <div class="vote-phase-title">Deterministisch</div>
+        <p class="vote-phase-detail">Stimmengewinner steht sofort fest. Bei Gleichstand entscheidet ein stabiler Seed-Algorithmus — kein Live-Lärm, keine endlose Diskussion.</p>
+        <div class="tiebreak-chip">roundSeed + candidateId → Tie-Breaker</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── 11 MATURITY ─────────────────────────────────────────── -->
+<!-- ── 11 MATURITY ───────────────────────────────────────────── -->
 <section class="slide" id="slide-11" data-title="Maturity">
   <div class="kicker-number">11</div>
   <div class="slide-inner grid-2">
     <div>
       <div class="eyebrow reveal">Produktreife</div>
       <div class="metric-hero reveal delay-1">44.679</div>
-      <div class="metric-caption reveal delay-2">Produktions-LOC · plus 2.524 Test-LOC</div>
+      <div class="metric-caption reveal delay-2">Produktions-LOC · plus 2.524 Test-LOC in 6 Testdateien</div>
       <div class="stat-strip reveal delay-3">
         <div class="stat"><strong>210</strong><span>Swift-Dateien</span></div>
-        <div class="stat"><strong>3</strong>  <span>soziale Scopes</span></div>
-        <div class="stat"><strong>4</strong>  <span>adaptive Tabs</span></div>
-        <div class="stat"><strong>1</strong>  <span>geschlossener Flow</span></div>
+        <div class="stat"><strong>3</strong><span>soziale Scopes</span></div>
+        <div class="stat"><strong>4</strong><span>adaptive Tabs</span></div>
+        <div class="stat"><strong>~213</strong><span>Ø LOC / Datei</span></div>
       </div>
     </div>
     <div class="card reveal delay-2" style="padding:32px">
-      <h3 style="font-size:34px;margin-bottom:12px">Kein Mockup.<br>Ein gewachsener Pre-Release-Build.</h3>
-      <p>Die Architektur ist weitgehend in spezialisierte Dateien zerlegt. Sichtbare Komplexität bleibt bewusst in einigen Screen-Shells und Orchestratoren.</p>
+      <h3 style="font-size:30px;margin-bottom:6px">Kein Mockup.<br>Ein gewachsener Pre-Release-Build.</h3>
+      <p style="margin-bottom:0;color:var(--muted)">Weitgehend in spezialisierte Dateien zerlegt. Komplexitätsschwerpunkte bleiben bewusst sichtbar.</p>
       <div class="bar-chart">
         <div class="bar-row"><span>Views</span>      <div class="bar"><i style="--w:93%"></i></div><b>20.800</b></div>
         <div class="bar-row"><span>ViewModels</span> <div class="bar"><i style="--w:46%"></i></div><b>10.186</b></div>
         <div class="bar-row"><span>Services</span>   <div class="bar"><i style="--w:44%"></i></div><b>9.671</b></div>
         <div class="bar-row"><span>Models</span>     <div class="bar"><i style="--w:13%"></i></div><b>2.881</b></div>
+        <div class="bar-row"><span>Utilities</span>  <div class="bar"><i style="--w:6%"></i></div> <b>1.141</b></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── 12 CLOSE ────────────────────────────────────────────── -->
+<!-- ── 12 CLOSE ──────────────────────────────────────────────── -->
 <section class="slide" id="slide-12" data-title="Close">
   <div class="kicker-number">12</div>
-  <div class="slide-inner grid-2">
-    <div>
-      <div class="eyebrow reveal">Nächster Schritt</div>
-      <h2 class="reveal delay-1">Gemeinsam entdecken.<br>Gemeinsam planen.<br><span class="gradient-text">Gemeinsam genießen.</span></h2>
-      <p class="lede reveal delay-2">Envie ist fachlich und cloudseitig integriert. Vor dem Launch stehen vor allem App-Check-Enforcement, reale Multi-Device-Tests und letzte Accessibility- und Performance-Politur.</p>
-      <a class="cta reveal delay-3" href="#slide-1">Envie · zurück zum Anfang ↗</a>
+  <div class="slide-inner close-layout">
+    <div class="eyebrow reveal" style="justify-content:center">Nächster Schritt</div>
+    <h2 class="reveal delay-1">Gemeinsam entdecken.<br>Gemeinsam planen.<br><span class="gradient-text">Gemeinsam genießen.</span></h2>
+    <p class="lede reveal delay-2">Envie ist fachlich und cloudseitig integriert. Vor dem Launch: App-Check-Enforcement, Multi-Device-Tests und Accessibility-Politur.</p>
+    <div class="close-cta-row reveal delay-3">
+      <a class="cta" href="#slide-1">Envie · zurück zum Anfang ↗</a>
     </div>
-    <div class="triple-phones reveal delay-2">
+    <div class="triple-phones reveal delay-4" style="margin-top:48px">
       <div class="phone-static"><img src="assets/swipe.webp" alt="Swipe"></div>
       <div class="phone-static" style="transform:translateY(-35px)"><img src="assets/weekplan.webp" alt="Plan"></div>
       <div class="phone-static"><img src="assets/cooking.webp" alt="Kochen"></div>
@@ -892,28 +1036,24 @@ h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px;
 </section>
 
 <script>
-/* ── INTERSECTION OBSERVER ──────────────────────────────────── */
+/* ── INTERSECTION OBSERVER ─────────────────────────────────────── */
 const slides   = [...document.querySelectorAll('.slide')];
 const progress = document.getElementById('progress');
 const current  = document.getElementById('current');
 let active = 0;
 
 const io = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('is-visible');
-      const idx = slides.indexOf(entry.target);
-      if (idx >= 0) {
-        active = idx;
-        current.textContent = String(idx + 1).padStart(2,'0');
-      }
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('is-visible');
+      const idx = slides.indexOf(e.target);
+      if (idx >= 0) { active = idx; current.textContent = String(idx+1).padStart(2,'0'); }
     }
   });
-}, { threshold: 0.35 });
-
+}, { threshold: 0.32 });
 slides.forEach(s => io.observe(s));
 
-/* ── PROGRESS BAR ───────────────────────────────────────────── */
+/* ── PROGRESS BAR ──────────────────────────────────────────────── */
 function updateProgress() {
   const max = document.documentElement.scrollHeight - innerHeight;
   progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
@@ -921,7 +1061,7 @@ function updateProgress() {
 addEventListener('scroll', updateProgress, { passive: true });
 updateProgress();
 
-/* ── NAVIGATION ─────────────────────────────────────────────── */
+/* ── NAVIGATION ────────────────────────────────────────────────── */
 function go(delta) {
   const idx = Math.max(0, Math.min(slides.length - 1, active + delta));
   slides[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -933,18 +1073,13 @@ document.getElementById('fs').onclick = () => {
   else document.exitFullscreen?.();
 };
 addEventListener('keydown', e => {
-  if (['ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); go(1);  }
+  if (['ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); go(1); }
   if (['ArrowUp','PageUp'].includes(e.key))          { e.preventDefault(); go(-1); }
-  if (e.key === 'Home') slides[0].scrollIntoView({ behavior: 'smooth' });
-  if (e.key === 'End')  slides.at(-1).scrollIntoView({ behavior: 'smooth' });
+  if (e.key === 'Home') slides[0].scrollIntoView({ behavior:'smooth' });
+  if (e.key === 'End')  slides.at(-1).scrollIntoView({ behavior:'smooth' });
 });
 
-/* ── ORBS: fade in on load ──────────────────────────────────── */
-document.querySelectorAll('.orb').forEach(orb => {
-  // animation handles opacity, just kick off the animation
-});
-
-/* ── PARALLAX KICKER NUMBERS ────────────────────────────────── */
+/* ── PARALLAX KICKER NUMBERS ───────────────────────────────────── */
 let ticking = false;
 addEventListener('scroll', () => {
   if (ticking) return;
@@ -953,9 +1088,9 @@ addEventListener('scroll', () => {
       const kicker = slide.querySelector('.kicker-number');
       if (!kicker) return;
       const rect = slide.getBoundingClientRect();
-      const progress = 1 - (rect.top / innerHeight);
-      if (progress > -0.3 && progress < 1.5) {
-        kicker.style.transform = `translateY(${(1 - progress) * 30}px)`;
+      const p = 1 - rect.top / innerHeight;
+      if (p > -0.5 && p < 1.6) {
+        kicker.style.transform = `translateY(${(1 - p) * 24}px)`;
       }
     });
     ticking = false;
@@ -963,17 +1098,15 @@ addEventListener('scroll', () => {
   ticking = true;
 }, { passive: true });
 
-/* ── SUBTLE CARD TILT ON HOVER ──────────────────────────────── */
+/* ── CARD TILT ON HOVER ────────────────────────────────────────── */
 document.querySelectorAll('.card').forEach(card => {
   card.addEventListener('mousemove', e => {
     const r = card.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width  - .5;
     const y = (e.clientY - r.top)  / r.height - .5;
-    card.style.transform = `translateY(-3px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
+    card.style.transform = `translateY(-3px) perspective(600px) rotateX(${-y*3}deg) rotateY(${x*3}deg)`;
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
 });
 </script>
 </body>

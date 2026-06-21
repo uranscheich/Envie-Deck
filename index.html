@@ -7,6 +7,7 @@
 <title>Envie — Interactive Pitch Deck</title>
 <meta name="description" content="Envie: Rezepte importieren, gemeinsam entscheiden, planen, einkaufen und kochen.">
 <style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
 :root {
   --bg:#050506;
   --surface:#111114;
@@ -20,204 +21,621 @@
   --green:#83d8ad;
   --amber:#f1b858;
   --radius:28px;
-  --shadow:0 30px 90px rgba(0,0,0,.48);
+  --shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
 }
-*{box-sizing:border-box}
-html{background:var(--bg);scroll-behavior:smooth}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
-  overflow-x:hidden;
+
+/* ── RESET ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
-body::before{
-  content:"";position:fixed;inset:-30vh -20vw;z-index:-5;pointer-events:none;
-  background:
-    radial-gradient(circle at 12% 24%,rgba(255,77,141,.17),transparent 27rem),
-    radial-gradient(circle at 82% 68%,rgba(35,184,245,.15),transparent 31rem),
-    radial-gradient(circle at 52% 42%,rgba(131,216,173,.06),transparent 38rem);
-  filter:blur(8px);
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+/* ── AMBIENT GRADIENT BG ─────────────────────────────────────── */
+.ambient-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+  overflow: hidden;
 }
-a{color:inherit;text-decoration:none}
-button{font:inherit}
-.deck-nav{
-  position:fixed;top:22px;left:24px;right:24px;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;pointer-events:none;
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  animation: orb-float linear infinite;
+  will-change: transform, opacity;
 }
-.brand,.deck-controls{pointer-events:auto}
-.brand{display:flex;align-items:center;gap:12px;font-weight:760;letter-spacing:-.02em}
-.brand-mark{position:relative;width:34px;height:26px}
-.brand-mark i{position:absolute;display:block;width:20px;height:26px;border-radius:7px}
-.brand-mark i:first-child{left:0;background:var(--pink)}
-.brand-mark i:last-child{right:0;background:var(--blue)}
-.brand small{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-.brand-text{display:flex;flex-direction:column;line-height:1}
-.deck-controls{
-  display:flex;gap:8px;padding:6px;border:1px solid var(--line);
-  background:rgba(15,15,18,.76);backdrop-filter:blur(20px);border-radius:999px;
+.orb-1 {
+  width: 60vw; height: 60vw;
+  left: -15vw; top: 10vh;
+  background: radial-gradient(circle, rgba(255,77,141,.22) 0%, transparent 70%);
+  animation-duration: 28s;
+  animation-delay: 0s;
 }
-.deck-controls button{
-  border:0;background:transparent;color:var(--muted);width:36px;height:36px;border-radius:50%;
-  cursor:pointer;transition:.25s ease;
+.orb-2 {
+  width: 50vw; height: 50vw;
+  right: -10vw; top: 40vh;
+  background: radial-gradient(circle, rgba(35,184,245,.18) 0%, transparent 70%);
+  animation-duration: 34s;
+  animation-delay: -8s;
 }
-.deck-controls button:hover{background:rgba(255,255,255,.08);color:#fff}
-.progress{
-  position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--blue));
-  width:0;z-index:120;transition:width .12s linear;
+.orb-3 {
+  width: 40vw; height: 40vw;
+  left: 30vw; bottom: 10vh;
+  background: radial-gradient(circle, rgba(131,216,173,.1) 0%, transparent 70%);
+  animation-duration: 22s;
+  animation-delay: -14s;
 }
-.slide-counter{
-  position:fixed;right:28px;bottom:24px;z-index:90;color:var(--muted);
-  font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+@keyframes orb-float {
+  0%   { transform: translate(0px, 0px) scale(1);    opacity: 0; }
+  10%  { opacity: 1; }
+  33%  { transform: translate(4vw, -3vh) scale(1.08); }
+  66%  { transform: translate(-3vw, 4vh) scale(.94); }
+  90%  { opacity: 1; }
+  100% { transform: translate(0px, 0px) scale(1);    opacity: 0; }
 }
-.slide{
-  min-height:100svh;position:relative;isolation:isolate;
-  display:flex;align-items:center;padding:96px clamp(24px,5vw,86px) 70px;
-  border-bottom:1px solid rgba(255,255,255,.045);
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+.deck-nav {
+  position: fixed;
+  top: 22px; left: 24px; right: 24px;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  pointer-events: none;
 }
-.slide-inner{width:min(1500px,100%);margin:0 auto}
-.eyebrow{
-  display:flex;align-items:center;gap:10px;color:var(--pink-soft);font-weight:780;
-  text-transform:uppercase;letter-spacing:.16em;font-size:12px;margin-bottom:20px;
+.brand, .deck-controls { pointer-events: auto; }
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 760; letter-spacing: -.02em;
 }
-.eyebrow::before{content:"";width:24px;height:2px;background:currentColor;border-radius:2px}
-h1,h2,h3,p{margin-top:0}
-h1,h2{
-  font-weight:820;letter-spacing:-.055em;line-height:.93;
-  text-wrap:balance;
+.brand-mark {
+  position: relative; width: 34px; height: 26px;
 }
-h1{font-size:clamp(58px,8.4vw,150px);max-width:1050px;margin-bottom:26px}
-h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
-.lede{font-size:clamp(18px,1.6vw,27px);line-height:1.45;color:#c9c9ce;max-width:850px}
-.gradient-text{
-  color:transparent;background:linear-gradient(90deg,#fff 0%,#fff 24%,var(--pink-soft) 63%,var(--blue) 100%);
-  -webkit-background-clip:text;background-clip:text;
+.brand-mark i {
+  position: absolute; display: block;
+  width: 20px; height: 26px; border-radius: 7px;
+  transition: transform .4s cubic-bezier(.2,.8,.2,1);
 }
-.grid-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.9fr);gap:clamp(34px,7vw,110px);align-items:center}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{
-  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
-  border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:inset 0 1px rgba(255,255,255,.04);
+.brand-mark i:first-child { left: 0; background: var(--pink); }
+.brand-mark i:last-child  { right: 0; background: var(--blue); }
+.brand:hover .brand-mark i:first-child { transform: rotate(-8deg) translateX(-2px); }
+.brand:hover .brand-mark i:last-child  { transform: rotate(8deg) translateX(2px); }
+.brand small {
+  font-size: 11px; color: var(--muted);
+  font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
 }
-.card h3{font-size:22px;letter-spacing:-.03em;margin-bottom:8px}
-.card p{color:var(--muted);line-height:1.5;margin:0}
-.pill-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:28px}
-.pill{
-  border:1px solid var(--line);padding:10px 14px;border-radius:999px;color:#d6d6da;font-size:13px;
-  background:rgba(255,255,255,.045)
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.deck-controls {
+  display: flex; gap: 8px; padding: 6px;
+  border: 1px solid var(--line);
+  background: rgba(8,8,10,.8);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 999px;
 }
-.phone-stage{position:relative;min-height:620px}
-.phone{
-  position:absolute;width:min(31vw,330px);aspect-ratio:709/1536;border-radius:38px;
-  overflow:hidden;background:#000;border:1px solid rgba(255,255,255,.15);
-  box-shadow:var(--shadow);transform-origin:center;transition:transform .6s cubic-bezier(.2,.8,.2,1);
+.deck-controls button {
+  border: 0; background: transparent; color: var(--muted);
+  width: 36px; height: 36px; border-radius: 50%;
+  cursor: pointer; transition: all .2s ease;
+  position: relative; overflow: hidden;
 }
-.phone img{width:100%;height:100%;object-fit:cover;display:block}
-.phone.a{left:2%;top:15%;transform:rotate(-7deg)}
-.phone.b{left:34%;top:2%;z-index:2;transform:translateY(-2%) scale(1.05)}
-.phone.c{right:2%;top:17%;transform:rotate(7deg)}
-.phone-stage:hover .phone.a{transform:rotate(-10deg) translate(-10px,-8px)}
-.phone-stage:hover .phone.b{transform:translateY(-5%) scale(1.08)}
-.phone-stage:hover .phone.c{transform:rotate(10deg) translate(10px,-8px)}
-.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px}
-.stat{padding:18px 20px;border-radius:20px;background:rgba(255,255,255,.045);border:1px solid var(--line)}
-.stat strong{display:block;font-size:clamp(24px,2.5vw,45px);letter-spacing:-.04em}
-.stat span{color:var(--muted);font-size:13px}
-.problem-stack{display:grid;gap:12px;margin-top:28px}
-.problem{display:flex;gap:15px;align-items:flex-start;padding:17px 0;border-top:1px solid var(--line)}
-.problem i{width:10px;height:10px;border-radius:50%;margin-top:8px;flex:0 0 auto}
-.problem p{margin:0;color:#d3d3d7;font-size:18px;line-height:1.45}
-.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:48px}
-.flow-step{min-height:180px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-.flow-step::after{content:"";position:absolute;right:-42px;bottom:-50px;width:120px;height:120px;border-radius:50%;background:var(--tone);filter:blur(35px);opacity:.26}
-.flow-step b{font-size:13px;color:var(--tone);letter-spacing:.12em;text-transform:uppercase}
-.flow-step strong{font-size:24px;letter-spacing:-.04em}
-.scope-card{min-height:260px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
-.scope-card .num{font-size:12px;color:var(--muted);letter-spacing:.18em}
-.scope-card h3{font-size:32px}
-.scope-card::before{content:"";position:absolute;inset:auto -60px -110px auto;width:230px;height:230px;border-radius:50%;background:var(--tone);filter:blur(65px);opacity:.25}
-.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px}
-.mode-card strong{font-size:48px;display:block;letter-spacing:-.05em;color:var(--tone)}
-.mode-card span{color:#fff;font-size:20px;font-weight:730}
-.mode-card p{margin-top:10px}
-.dual-phones{display:grid;grid-template-columns:repeat(2,minmax(250px,360px));justify-content:center;gap:28px;align-items:end}
-.dual-phones .phone-static,.triple-phones .phone-static{
-  border-radius:34px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow);background:#000
+.deck-controls button::after {
+  content: "";
+  position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.15), transparent);
+  opacity: 0; transition: opacity .2s;
 }
-.phone-static img{width:100%;display:block}
-.triple-phones{display:grid;grid-template-columns:repeat(3,minmax(190px,280px));gap:20px;justify-content:center;align-items:end}
-.feature-list{display:grid;gap:16px;margin-top:28px}
-.feature-row{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
-.feature-row .icon{width:44px;height:44px;border-radius:15px;background:rgba(255,255,255,.07);display:grid;place-items:center;color:var(--tone);font-weight:900}
-.feature-row h3{font-size:20px;margin:1px 0 5px}
-.feature-row p{margin:0;color:var(--muted);line-height:1.5}
-.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:44px}
-.pipeline .card{min-height:160px}
-.pipeline .card b{color:var(--tone);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
-.pipeline .card strong{display:block;margin-top:34px;font-size:22px}
-.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:32px}
-.tech{display:flex;justify-content:space-between;gap:18px;align-items:flex-end}
-.tech b{font-size:18px}
-.tech span{color:var(--muted);font-size:13px;text-align:right}
-.friends-layout{display:grid;grid-template-columns:.82fr 1.18fr;gap:28px;align-items:center}
-.friends-layout .visuals{display:grid;grid-template-columns:.88fr 1.12fr;gap:18px;align-items:end}
-.metric-hero{font-size:clamp(72px,12vw,205px);font-weight:850;letter-spacing:-.075em;line-height:.8}
-.metric-caption{color:var(--muted);font-size:16px;margin-top:18px}
-.bar-chart{display:grid;gap:12px;margin-top:38px}
-.bar-row{display:grid;grid-template-columns:120px 1fr 70px;gap:13px;align-items:center;font-size:13px;color:var(--muted)}
-.bar{height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--pink),var(--blue));border-radius:inherit}
-.cta{
-  display:inline-flex;align-items:center;gap:10px;padding:16px 22px;border-radius:999px;
-  background:linear-gradient(90deg,var(--pink),#fa7ca5);color:#fff;font-weight:800;
-  box-shadow:0 14px 50px rgba(255,77,141,.25);margin-top:28px;
+.deck-controls button:hover { color: #fff; }
+.deck-controls button:hover::after { opacity: 1; }
+.deck-controls button:active { transform: scale(.9); }
+
+/* ── PROGRESS BAR ─────────────────────────────────────────────── */
+.progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--pink), var(--blue), var(--green));
+  background-size: 200% 100%;
+  width: 0; z-index: 120;
+  transition: width .08s linear;
+  animation: progress-shimmer 3s linear infinite;
+  box-shadow: 0 0 12px rgba(255,77,141,.6);
 }
-.footer-note{position:absolute;left:clamp(24px,5vw,86px);bottom:24px;color:#686872;font-size:11px}
-.reveal{opacity:0;transform:translateY(34px);transition:opacity .85s ease,transform .85s cubic-bezier(.2,.8,.2,1)}
-.slide.is-visible .reveal{opacity:1;transform:none}
-.delay-1{transition-delay:.08s} .delay-2{transition-delay:.16s} .delay-3{transition-delay:.24s}
-.kicker-number{position:absolute;right:4vw;top:12vh;font-size:min(24vw,360px);font-weight:900;letter-spacing:-.08em;color:rgba(255,255,255,.025);z-index:-1}
-@media (min-width:980px){
-  html,body{scroll-snap-type:y mandatory}
-  .slide{scroll-snap-align:start;scroll-snap-stop:always}
+@keyframes progress-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
-@media (max-width:1100px){
-  .grid-2,.friends-layout{grid-template-columns:1fr}
-  .phone-stage{min-height:560px}
-  .flow{grid-template-columns:repeat(3,1fr)}
-  .grid-3{grid-template-columns:1fr}
-  .scope-card{min-height:180px}
+
+/* ── SLIDE COUNTER ────────────────────────────────────────────── */
+.slide-counter {
+  position: fixed; right: 28px; bottom: 24px;
+  z-index: 90; color: var(--muted);
+  font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  background: rgba(8,8,10,.6);
+  backdrop-filter: blur(12px);
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line);
 }
-@media (max-width:700px){
-  .deck-nav{top:12px;left:14px;right:14px}
-  .brand small{display:none}
-  .slide{padding:88px 18px 58px;align-items:flex-start}
-  h1{font-size:clamp(54px,18vw,86px)}
-  h2{font-size:clamp(44px,14vw,72px)}
-  .lede{font-size:18px}
-  .phone-stage{min-height:520px;margin-top:8px}
-  .phone{width:45vw;border-radius:24px}
-  .phone.a{left:0;top:20%} .phone.b{left:28%;top:3%} .phone.c{right:0;top:25%}
-  .stat-strip{grid-template-columns:repeat(2,1fr)}
-  .flow,.mode-grid,.pipeline,.tech-grid{grid-template-columns:1fr}
-  .dual-phones{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .triple-phones{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-  .phone-static,.triple-phones .phone-static{border-radius:20px}
-  .friends-layout .visuals{gap:10px}
-  .slide-counter{right:16px;bottom:14px}
-  .flow-step{min-height:130px}
+
+/* ── SLIDES ───────────────────────────────────────────────────── */
+.slide {
+  min-height: 100svh;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  padding: 96px clamp(20px,5vw,86px) 70px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  overflow: hidden;
 }
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
-  .reveal{opacity:1;transform:none}
+.slide-inner {
+  width: min(1500px,100%);
+  margin: 0 auto;
 }
-@media print{
-  .deck-nav,.progress,.slide-counter{display:none!important}
-  .slide{page-break-after:always;min-height:100vh;padding:50px}
-  body{background:#050506!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* ── EYEBROW ─────────────────────────────────────────────────── */
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--pink-soft); font-weight: 780;
+  text-transform: uppercase; letter-spacing: .16em;
+  font-size: 12px; margin-bottom: 20px;
+}
+.eyebrow::before {
+  content: ""; flex-shrink: 0;
+  width: 24px; height: 2px;
+  background: currentColor; border-radius: 2px;
+}
+
+/* ── TYPE SCALE ──────────────────────────────────────────────── */
+h1, h2, h3, p { margin-top: 0; }
+h1, h2 {
+  font-weight: 820; letter-spacing: -.055em;
+  line-height: .93; text-wrap: balance;
+}
+h1 { font-size: clamp(52px,8.4vw,150px); max-width: 1050px; margin-bottom: 26px; }
+h2 { font-size: clamp(40px,6.2vw,110px); max-width: 1150px; margin-bottom: 24px; }
+.lede { font-size: clamp(17px,1.6vw,27px); line-height: 1.45; color: #c9c9ce; max-width: 850px; }
+
+/* ── GRADIENT TEXT ───────────────────────────────────────────── */
+.gradient-text {
+  color: transparent;
+  background: linear-gradient(90deg,#fff 0%,#fff 24%,var(--pink-soft) 63%,var(--blue) 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+
+/* ── LAYOUTS ─────────────────────────────────────────────────── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,.9fr);
+  gap: clamp(28px,7vw,110px);
+  align-items: center;
+}
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+
+/* ── CARDS ───────────────────────────────────────────────────── */
+.card {
+  background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: inset 0 1px rgba(255,255,255,.06), 0 1px 2px rgba(0,0,0,.4);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: calc(var(--radius) + 1px);
+  background: linear-gradient(135deg, rgba(255,255,255,.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity .35s;
+  pointer-events: none;
+}
+.card:hover { transform: translateY(-3px); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.1); }
+.card:hover::before { opacity: 1; }
+.card h3 { font-size: 22px; letter-spacing: -.03em; margin-bottom: 8px; }
+.card p { color: var(--muted); line-height: 1.5; margin: 0; }
+
+/* ── PILLS ───────────────────────────────────────────────────── */
+.pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+.pill {
+  border: 1px solid var(--line);
+  padding: 10px 16px; border-radius: 999px;
+  color: #d6d6da; font-size: 13px;
+  background: rgba(255,255,255,.045);
+  transition: background .2s, border-color .2s;
+}
+.pill:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); }
+
+/* ── PHONE STAGE (animated) ──────────────────────────────────── */
+.phone-stage {
+  position: relative; min-height: 620px;
+}
+.phone {
+  position: absolute;
+  width: min(31vw, 330px);
+  aspect-ratio: 709/1536;
+  border-radius: 38px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: var(--shadow);
+  transform-origin: center;
+  transition: transform .7s cubic-bezier(.2,.8,.2,1), box-shadow .7s ease;
+  will-change: transform;
+}
+.phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.phone.a { left: 2%;   top: 15%; transform: rotate(-7deg); }
+.phone.b { left: 34%;  top: 2%;  z-index: 2; transform: translateY(-2%) scale(1.05); }
+.phone.c { right: 2%;  top: 17%; transform: rotate(7deg); }
+.phone-stage:hover .phone.a { transform: rotate(-11deg) translate(-12px,-10px) scale(1.02); box-shadow: 0 50px 120px rgba(0,0,0,.7); }
+.phone-stage:hover .phone.b { transform: translateY(-6%) scale(1.1); box-shadow: 0 60px 140px rgba(0,0,0,.8); }
+.phone-stage:hover .phone.c { transform: rotate(11deg) translate(12px,-10px) scale(1.02); box-shadow: 0 50px 120px rgba(0,0,0,.7); }
+
+/* levitating on idle */
+@keyframes phone-float-a { 0%,100% { translate: 0 0; } 50% { translate: -4px 6px; } }
+@keyframes phone-float-b { 0%,100% { translate: 0 0; } 50% { translate: 2px -8px; } }
+@keyframes phone-float-c { 0%,100% { translate: 0 0; } 50% { translate: 5px 5px; } }
+.phone-stage:not(:hover) .phone.a { animation: phone-float-a 7s ease-in-out infinite; }
+.phone-stage:not(:hover) .phone.b { animation: phone-float-b 9s ease-in-out infinite; }
+.phone-stage:not(:hover) .phone.c { animation: phone-float-c 8s ease-in-out infinite; }
+
+/* ── STATS STRIP ─────────────────────────────────────────────── */
+.stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 34px; }
+.stat {
+  padding: 18px 20px; border-radius: 20px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line);
+  transition: background .3s;
+}
+.stat:hover { background: rgba(255,255,255,.07); }
+.stat strong {
+  display: block;
+  font-size: clamp(24px,2.5vw,45px);
+  letter-spacing: -.04em;
+  background: linear-gradient(135deg, #fff, var(--muted));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.stat span { color: var(--muted); font-size: 13px; }
+
+/* ── PROBLEM STACK ───────────────────────────────────────────── */
+.problem-stack { display: grid; gap: 12px; margin-top: 28px; }
+.problem {
+  display: flex; gap: 15px; align-items: flex-start;
+  padding: 17px 0; border-top: 1px solid var(--line);
+}
+.problem i { width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; flex: 0 0 auto; }
+.problem p { margin: 0; color: #d3d3d7; font-size: 18px; line-height: 1.45; }
+
+/* ── FLOW ────────────────────────────────────────────────────── */
+.flow { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-top: 48px; }
+.flow-step {
+  min-height: 180px; display: flex; flex-direction: column;
+  justify-content: space-between; position: relative; overflow: hidden;
+}
+.flow-step::after {
+  content: ""; position: absolute; right: -42px; bottom: -50px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: var(--tone); filter: blur(40px); opacity: .3;
+  transition: opacity .4s;
+}
+.flow-step:hover::after { opacity: .5; }
+.flow-step b { font-size: 13px; color: var(--tone); letter-spacing: .12em; text-transform: uppercase; }
+.flow-step strong { font-size: 24px; letter-spacing: -.04em; }
+
+/* ── SCOPE CARDS ─────────────────────────────────────────────── */
+.scope-card {
+  min-height: 260px; display: flex; flex-direction: column;
+  justify-content: space-between; overflow: hidden; position: relative;
+}
+.scope-card .num { font-size: 12px; color: var(--muted); letter-spacing: .18em; }
+.scope-card h3 { font-size: 32px; }
+.scope-card::before {
+  content: ""; position: absolute; inset: auto -60px -110px auto;
+  width: 230px; height: 230px; border-radius: 50%;
+  background: var(--tone); filter: blur(70px); opacity: .22;
+  transition: opacity .4s, transform .4s;
+}
+.scope-card:hover::before { opacity: .38; transform: scale(1.1); }
+
+/* ── MODE GRID ───────────────────────────────────────────────── */
+.mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 34px; }
+.mode-card strong { font-size: 48px; display: block; letter-spacing: -.05em; color: var(--tone); }
+.mode-card span   { color: #fff; font-size: 20px; font-weight: 730; }
+.mode-card p      { margin-top: 10px; }
+
+/* ── PHONE STATICS ───────────────────────────────────────────── */
+.dual-phones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,360px));
+  justify-content: center;
+  gap: 28px;
+  align-items: end;
+}
+.triple-phones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,280px));
+  gap: 20px;
+  justify-content: center;
+  align-items: end;
+}
+.dual-phones .phone-static,
+.triple-phones .phone-static,
+.phone-static {
+  border-radius: 34px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--shadow);
+  background: #000;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease;
+}
+.phone-static:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 60px 120px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.12);
+}
+.phone-static img { width: 100%; display: block; }
+
+/* ── FEATURE LIST ────────────────────────────────────────────── */
+.feature-list { display: grid; gap: 16px; margin-top: 28px; }
+.feature-row {
+  display: grid; grid-template-columns: 44px 1fr;
+  gap: 14px; align-items: start;
+}
+.feature-row .icon {
+  width: 44px; height: 44px; border-radius: 15px;
+  background: rgba(255,255,255,.07); display: grid;
+  place-items: center; color: var(--tone); font-weight: 900;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: background .3s, transform .3s;
+}
+.feature-row:hover .icon { background: rgba(255,255,255,.12); transform: scale(1.08); }
+.feature-row h3 { font-size: 20px; margin: 1px 0 5px; }
+.feature-row p  { margin: 0; color: var(--muted); line-height: 1.5; }
+
+/* ── PIPELINE ────────────────────────────────────────────────── */
+.pipeline { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; margin-top: 44px; }
+.pipeline .card { min-height: 160px; }
+.pipeline .card b      { color: var(--tone); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.pipeline .card strong { display: block; margin-top: 34px; font-size: 22px; }
+
+/* animated connector lines between pipeline cards */
+.pipeline { position: relative; }
+.pipeline::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pink), var(--blue), var(--green), var(--amber), transparent);
+  z-index: -1;
+  opacity: .4;
+  pointer-events: none;
+}
+
+/* ── TECH GRID ───────────────────────────────────────────────── */
+.tech-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 32px; }
+.tech { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end; }
+.tech b    { font-size: 18px; }
+.tech span { color: var(--muted); font-size: 13px; text-align: right; }
+
+/* ── FRIENDS LAYOUT ──────────────────────────────────────────── */
+.friends-layout {
+  display: grid; grid-template-columns: .82fr 1.18fr;
+  gap: 28px; align-items: center;
+}
+.friends-layout .visuals {
+  display: grid; grid-template-columns: .88fr 1.12fr;
+  gap: 18px; align-items: end;
+}
+
+/* ── METRIC HERO ─────────────────────────────────────────────── */
+.metric-hero {
+  font-size: clamp(64px,12vw,205px);
+  font-weight: 850; letter-spacing: -.075em; line-height: .8;
+  background: linear-gradient(135deg, #fff 30%, var(--pink-soft) 70%, var(--blue));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.metric-caption { color: var(--muted); font-size: 16px; margin-top: 18px; }
+
+/* ── BAR CHART ───────────────────────────────────────────────── */
+.bar-chart { display: grid; gap: 12px; margin-top: 38px; }
+.bar-row {
+  display: grid; grid-template-columns: 120px 1fr 70px;
+  gap: 13px; align-items: center; font-size: 13px; color: var(--muted);
+}
+.bar { height: 8px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+.bar i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--pink), var(--blue));
+  border-radius: inherit;
+  transition: width 1.2s cubic-bezier(.2,.8,.2,1);
+}
+.slide.is-visible .bar i { width: var(--w); }
+
+/* ── CTA ─────────────────────────────────────────────────────── */
+.cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 28px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--pink), #fa7ca5);
+  color: #fff; font-weight: 800;
+  box-shadow: 0 14px 50px rgba(255,77,141,.3), 0 0 0 1px rgba(255,255,255,.08) inset;
+  margin-top: 28px;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+  position: relative; overflow: hidden;
+}
+.cta::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.2) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .6s ease;
+}
+.cta:hover { transform: translateY(-2px); box-shadow: 0 20px 70px rgba(255,77,141,.45), 0 0 0 1px rgba(255,255,255,.15) inset; }
+.cta:hover::after { transform: translateX(100%); }
+.cta:active { transform: translateY(0); }
+
+/* ── FOOTER NOTE ─────────────────────────────────────────────── */
+.footer-note {
+  position: absolute; left: clamp(20px,5vw,86px); bottom: 24px;
+  color: #55555e; font-size: 11px;
+}
+
+/* ── REVEAL ANIMATIONS ───────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1);
+}
+.slide.is-visible .reveal { opacity: 1; transform: none; }
+.delay-1  { transition-delay: .10s; }
+.delay-2  { transition-delay: .20s; }
+.delay-3  { transition-delay: .32s; }
+.delay-4  { transition-delay: .44s; }
+
+/* stagger children automatically */
+.flow .card:nth-child(1)  { transition-delay: .05s; }
+.flow .card:nth-child(2)  { transition-delay: .14s; }
+.flow .card:nth-child(3)  { transition-delay: .23s; }
+.flow .card:nth-child(4)  { transition-delay: .32s; }
+.flow .card:nth-child(5)  { transition-delay: .41s; }
+
+/* ── KICKER NUMBERS ──────────────────────────────────────────── */
+.kicker-number {
+  position: absolute; right: 4vw; top: 8vh;
+  font-size: min(24vw, 360px); font-weight: 900;
+  letter-spacing: -.08em; color: rgba(255,255,255,.022);
+  z-index: -1; pointer-events: none;
+  user-select: none;
+  transform: translateY(20px);
+  transition: transform 1.4s cubic-bezier(.2,.8,.2,1), opacity 1.4s;
+  opacity: 0;
+}
+.slide.is-visible .kicker-number { transform: translateY(0); opacity: 1; }
+
+/* ── SCROLL SNAP (desktop only) ──────────────────────────────── */
+@media (min-width: 980px) {
+  html, body { scroll-snap-type: y mandatory; }
+  .slide { scroll-snap-align: start; scroll-snap-stop: always; }
+}
+
+/* ── RESPONSIVE: TABLET ──────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .grid-2, .friends-layout { grid-template-columns: minmax(0,1fr); }
+  .phone-stage { min-height: 520px; }
+  .flow { grid-template-columns: repeat(3,1fr); }
+  .grid-3 { grid-template-columns: 1fr; }
+  .scope-card { min-height: 180px; }
+  .dual-phones {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    max-width: 560px; margin: 0 auto;
+  }
+  .triple-phones {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    max-width: 720px; margin: 0 auto;
+  }
+}
+
+/* ── RESPONSIVE: MOBILE ──────────────────────────────────────── */
+@media (max-width: 700px) {
+  .deck-nav { top: 12px; left: 12px; right: 12px; }
+  .brand small { display: none; }
+
+  .slide { padding: 88px 16px 58px; align-items: flex-start; overflow: hidden; }
+
+  h1 { font-size: clamp(48px,16vw,80px); }
+  h2 { font-size: clamp(38px,12vw,64px); }
+  .lede { font-size: 17px; }
+
+  /* phone stage: smaller, all three visible */
+  .phone-stage { min-height: 460px; margin-top: 16px; width: 100%; }
+  .phone { width: 42vw; border-radius: 22px; }
+  .phone.a { left: 0;   top: 18%; }
+  .phone.b { left: 50%; top: 3%;  transform: translateX(-50%) scale(1.05); }
+  .phone.c { right: 0;  top: 22%; }
+  .phone-stage:hover .phone.a { transform: rotate(-8deg) translate(-6px,-6px); }
+  .phone-stage:hover .phone.b { transform: translateX(-50%) translateY(-5%) scale(1.08); }
+  .phone-stage:hover .phone.c { transform: rotate(8deg) translate(6px,-6px); }
+
+  .stat-strip { grid-template-columns: repeat(2,1fr); }
+  .flow        { grid-template-columns: 1fr; }
+  .mode-grid   { grid-template-columns: 1fr; }
+  .pipeline    { grid-template-columns: 1fr; }
+  .tech-grid   { grid-template-columns: 1fr; }
+  .friends-layout .visuals { gap: 10px; }
+
+  .dual-phones {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px; max-width: 100%;
+  }
+  .triple-phones {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 7px; max-width: 100%;
+  }
+  .dual-phones .phone-static,
+  .triple-phones .phone-static,
+  .phone-static { border-radius: 18px; }
+  /* prevent any stray overflow */
+  .dual-phones,
+  .triple-phones { overflow: hidden; }
+
+  .slide-counter { right: 14px; bottom: 12px; }
+  .flow-step     { min-height: 130px; }
+  .bar-row { grid-template-columns: 90px 1fr 58px; gap: 8px; }
+  .metric-hero { font-size: clamp(56px,20vw,120px); }
+  .kicker-number { font-size: min(40vw,200px); }
+  .pipeline::after { display: none; }
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .slide.is-visible .kicker-number { opacity: 1; transform: none; }
+}
+
+/* ── PRINT ───────────────────────────────────────────────────── */
+@media print {
+  .deck-nav, .progress, .slide-counter { display: none !important; }
+  .slide { page-break-after: always; min-height: 100vh; padding: 50px; overflow: visible; }
+  body { background: #050506 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ── SHIMMER UTILITY (for pipeline/card hover) ───────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.card-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.06) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+  border-radius: inherit;
 }
 </style>
 </head>
 <body>
+
+<!-- ambient orbs -->
+<div class="ambient-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
 <div class="progress" id="progress"></div>
+
 <nav class="deck-nav" aria-label="Deck navigation">
   <a class="brand" href="#slide-1">
     <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
@@ -226,11 +644,13 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   <div class="deck-controls">
     <button id="prev" aria-label="Vorherige Folie">↑</button>
     <button id="next" aria-label="Nächste Folie">↓</button>
-    <button id="fs" aria-label="Vollbild">⛶</button>
+    <button id="fs"   aria-label="Vollbild">⛶</button>
   </div>
 </nav>
+
 <div class="slide-counter"><span id="current">01</span> / 12</div>
 
+<!-- ── 01 INTRO ────────────────────────────────────────────── -->
 <section class="slide" id="slide-1" data-title="Intro">
   <div class="kicker-number">01</div>
   <div class="slide-inner grid-2">
@@ -238,7 +658,11 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
       <div class="eyebrow reveal">Pitchdeck · App Store Launch</div>
       <h1 class="reveal delay-1">Was essen wir <span class="gradient-text">heute?</span></h1>
       <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen, konsequenten Produktfluss.</p>
-      <div class="pill-row reveal delay-3"><span class="pill">Local-first</span><span class="pill">Cloud, wo Zusammenarbeit beginnt</span><span class="pill">On-device AI</span></div>
+      <div class="pill-row reveal delay-3">
+        <span class="pill">Local-first</span>
+        <span class="pill">Cloud, wo Zusammenarbeit beginnt</span>
+        <span class="pill">On-device AI</span>
+      </div>
     </div>
     <div class="phone-stage reveal delay-2">
       <div class="phone a"><img src="assets/friends_home.webp" alt="Envie Friends Übersicht"></div>
@@ -248,6 +672,7 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 02 PROBLEM ──────────────────────────────────────────── -->
 <section class="slide" id="slide-2" data-title="Problem">
   <div class="kicker-number">02</div>
   <div class="slide-inner grid-2">
@@ -268,39 +693,42 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 03 FLOW ─────────────────────────────────────────────── -->
 <section class="slide" id="slide-3" data-title="Flow">
   <div class="kicker-number">03</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Produktfluss</div>
     <h2 class="reveal delay-1">Nicht noch eine Rezept-App.<br>Ein geschlossener Kreislauf.</h2>
     <div class="flow">
-      <div class="card flow-step reveal" style="--tone:var(--pink)"><b>01</b><strong>Import</strong><p>Kamera, PDF, Web & Share</p></div>
-      <div class="card flow-step reveal delay-1" style="--tone:var(--blue)"><b>02</b><strong>Kochbuch</strong><p>Suchen, sammeln, entdecken</p></div>
-      <div class="card flow-step reveal delay-2" style="--tone:var(--green)"><b>03</b><strong>Entscheiden</strong><p>Quick, Woche, Endlos, Friends</p></div>
-      <div class="card flow-step reveal delay-3" style="--tone:var(--amber)"><b>04</b><strong>Planen</strong><p>Woche, Monat, Einkauf</p></div>
-      <div class="card flow-step reveal delay-3" style="--tone:var(--pink-soft)"><b>05</b><strong>Kochen</strong><p>Schritt für Schritt bis fertig</p></div>
+      <div class="card flow-step reveal" style="--tone:var(--pink)"><b>01</b><strong>Import</strong><p>Kamera, PDF, Web &amp; Share</p></div>
+      <div class="card flow-step reveal" style="--tone:var(--blue)"><b>02</b><strong>Kochbuch</strong><p>Suchen, sammeln, entdecken</p></div>
+      <div class="card flow-step reveal" style="--tone:var(--green)"><b>03</b><strong>Entscheiden</strong><p>Quick, Woche, Endlos, Friends</p></div>
+      <div class="card flow-step reveal" style="--tone:var(--amber)"><b>04</b><strong>Planen</strong><p>Woche, Monat, Einkauf</p></div>
+      <div class="card flow-step reveal" style="--tone:var(--pink-soft)"><b>05</b><strong>Kochen</strong><p>Schritt für Schritt bis fertig</p></div>
     </div>
   </div>
 </section>
 
+<!-- ── 04 SCOPES ───────────────────────────────────────────── -->
 <section class="slide" id="slide-4" data-title="Scopes">
   <div class="kicker-number">04</div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Entscheidungszentrale</div>
     <h2 class="reveal delay-1">Drei soziale Scopes.<br>Drei klare Modi.</h2>
     <div class="grid-3" style="margin-top:36px">
-      <article class="card scope-card reveal" style="--tone:var(--blue)"><span class="num">01 · DEVICE</span><div><h3>Lokal</h3><p>Geräteinterne Personenprofile, SwiftData und ein gemeinsamer Plan.</p></div></article>
-      <article class="card scope-card reveal delay-1" style="--tone:var(--pink)"><span class="num">02 · HOUSEHOLD</span><div><h3>Familie</h3><p>Dauerhafter Haushalt mit Auth, Echtzeit-Reaktionen und Cloud-Plan.</p></div></article>
-      <article class="card scope-card reveal delay-2" style="--tone:var(--green)"><span class="num">03 · EVENT</span><div><h3>Freunde</h3><p>Temporäre Gruppenrunde mit Invite-Token, zwei Phasen und gebündelten Ballots.</p></div></article>
+      <article class="card scope-card reveal"         style="--tone:var(--blue)"> <span class="num">01 · DEVICE</span>    <div><h3>Lokal</h3>    <p>Geräteinterne Personenprofile, SwiftData und ein gemeinsamer Plan.</p></div></article>
+      <article class="card scope-card reveal delay-1" style="--tone:var(--pink)"> <span class="num">02 · HOUSEHOLD</span> <div><h3>Familie</h3>  <p>Dauerhafter Haushalt mit Auth, Echtzeit-Reaktionen und Cloud-Plan.</p></div></article>
+      <article class="card scope-card reveal delay-2" style="--tone:var(--green)"><span class="num">03 · EVENT</span>    <div><h3>Freunde</h3>  <p>Temporäre Gruppenrunde mit Invite-Token, zwei Phasen und gebündelten Ballots.</p></div></article>
     </div>
     <div class="mode-grid">
-      <div class="card mode-card reveal" style="--tone:var(--blue)"><strong>7</strong><span>Jetzt schnell</span><p>Der erste Match gewinnt.</p></div>
-      <div class="card mode-card reveal delay-1" style="--tone:var(--pink)"><strong>20</strong><span>Woche planen</span><p>Begrenzte Runde mit Planwirkung.</p></div>
-      <div class="card mode-card reveal delay-2" style="--tone:var(--green)"><strong>∞</strong><span>Endlos</span><p>Geschmack lernen, ohne Planwrite.</p></div>
+      <div class="card mode-card reveal"         style="--tone:var(--blue)"> <strong>7</strong>  <span>Jetzt schnell</span> <p>Der erste Match gewinnt.</p></div>
+      <div class="card mode-card reveal delay-1" style="--tone:var(--pink)"> <strong>20</strong> <span>Woche planen</span>  <p>Begrenzte Runde mit Planwirkung.</p></div>
+      <div class="card mode-card reveal delay-2" style="--tone:var(--green)"><strong>∞</strong>  <span>Endlos</span>       <p>Geschmack lernen, ohne Planwrite.</p></div>
     </div>
   </div>
 </section>
 
+<!-- ── 05 DECISION ENGINE ──────────────────────────────────── -->
 <section class="slide" id="slide-5" data-title="Decision Engine">
   <div class="kicker-number">05</div>
   <div class="slide-inner grid-2">
@@ -309,9 +737,9 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
       <h2 class="reveal delay-1">Ein Like ist noch kein Abendessen.</h2>
       <p class="lede reveal delay-2">Envie schützt den Wochenplan vor Zufallstreffern. Einzelne Likes bleiben Freigaben. Erst planrelevante gemeinsame Treffer werden zur Handlung.</p>
       <div class="feature-list reveal delay-3">
-        <div class="feature-row" style="--tone:var(--pink)"><div class="icon">♥</div><div><h3>Solo-Like</h3><p>Speichert Zustimmung, erzeugt aber keinen Plan-Eintrag.</p></div></div>
-        <div class="feature-row" style="--tone:var(--blue)"><div class="icon">×2</div><div><h3>Match</h3><p>Wird im passenden Kontext einmalig und idempotent verarbeitet.</p></div></div>
-        <div class="feature-row" style="--tone:var(--green)"><div class="icon">↺</div><div><h3>Kontext bleibt sauber</h3><p>Quick, Woche, Endlos, Family und Friends vermischen ihre Wahrheit nicht.</p></div></div>
+        <div class="feature-row" style="--tone:var(--pink)"> <div class="icon">♥</div>  <div><h3>Solo-Like</h3><p>Speichert Zustimmung, erzeugt aber keinen Plan-Eintrag.</p></div></div>
+        <div class="feature-row" style="--tone:var(--blue)"> <div class="icon">×2</div> <div><h3>Match</h3><p>Wird im passenden Kontext einmalig und idempotent verarbeitet.</p></div></div>
+        <div class="feature-row" style="--tone:var(--green)"><div class="icon">↺</div>  <div><h3>Kontext bleibt sauber</h3><p>Quick, Woche, Endlos, Family und Friends vermischen ihre Wahrheit nicht.</p></div></div>
       </div>
     </div>
     <div class="dual-phones reveal delay-2">
@@ -321,6 +749,7 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 06 PLAN ─────────────────────────────────────────────── -->
 <section class="slide" id="slide-6" data-title="Plan">
   <div class="kicker-number">06</div>
   <div class="slide-inner">
@@ -335,6 +764,7 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 07 COOKING ──────────────────────────────────────────── -->
 <section class="slide" id="slide-7" data-title="Cooking">
   <div class="kicker-number">07</div>
   <div class="slide-inner grid-2">
@@ -349,12 +779,13 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
         <div class="card tech"><b>System UI</b><span>Dynamic Island<br>Live Activity</span></div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2" style="grid-template-columns:minmax(240px,390px)">
+    <div class="dual-phones reveal delay-2" style="grid-template-columns:minmax(0,390px)">
       <div class="phone-static"><img src="assets/cooking.webp" alt="Envie Kochmodus mit Timer"></div>
     </div>
   </div>
 </section>
 
+<!-- ── 08 AI IMPORT ────────────────────────────────────────── -->
 <section class="slide" id="slide-8" data-title="AI Import">
   <div class="kicker-number">08</div>
   <div class="slide-inner">
@@ -362,14 +793,15 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
     <h2 class="reveal delay-1">Der Import macht Envie erst dauerhaft wertvoll.</h2>
     <p class="lede reveal delay-2">Rezepte werden nicht nur gespeichert, sondern strukturiert: Vision-OCR liest, Apple Foundation Models ordnen, die Review-Ansicht hält den Nutzer in Kontrolle.</p>
     <div class="pipeline">
-      <div class="card reveal" style="--tone:var(--pink)"><b>Input</b><strong>Kamera · PDF · Web</strong><p>Share- und Action-Extension inklusive.</p></div>
-      <div class="card reveal delay-1" style="--tone:var(--blue)"><b>Read</b><strong>Apple Vision OCR</strong><p>Texterkennung direkt auf dem Gerät.</p></div>
-      <div class="card reveal delay-2" style="--tone:var(--green)"><b>Structure</b><strong>Foundation Models</strong><p>Zutaten, Schritte und Metadaten.</p></div>
-      <div class="card reveal delay-3" style="--tone:var(--amber)"><b>Control</b><strong>Review & Save</strong><p>Prüfen, korrigieren, lokal sichern.</p></div>
+      <div class="card reveal"         style="--tone:var(--pink)"> <b>Input</b>    <strong>Kamera · PDF · Web</strong>    <p>Share- und Action-Extension inklusive.</p></div>
+      <div class="card reveal delay-1" style="--tone:var(--blue)"> <b>Read</b>     <strong>Apple Vision OCR</strong>       <p>Texterkennung direkt auf dem Gerät.</p></div>
+      <div class="card reveal delay-2" style="--tone:var(--green)"><b>Structure</b><strong>Foundation Models</strong>       <p>Zutaten, Schritte und Metadaten.</p></div>
+      <div class="card reveal delay-3" style="--tone:var(--amber)"><b>Control</b>  <strong>Review &amp; Save</strong>      <p>Prüfen, korrigieren, lokal sichern.</p></div>
     </div>
   </div>
 </section>
 
+<!-- ── 09 ARCHITECTURE ─────────────────────────────────────── -->
 <section class="slide" id="slide-9" data-title="Architecture">
   <div class="kicker-number">09</div>
   <div class="slide-inner grid-2">
@@ -391,6 +823,7 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 10 FRIENDS ──────────────────────────────────────────── -->
 <section class="slide" id="slide-10" data-title="Friends">
   <div class="kicker-number">10</div>
   <div class="slide-inner friends-layout">
@@ -399,9 +832,9 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
       <h2 class="reveal delay-1">Keine Chat-Abstimmung.<br>Eine gehostete Entscheidung.</h2>
       <p class="lede reveal delay-2">Temporäre Gruppenrunde, sichere Invite-Tokens, gebündelte Ballots und ein zweiphasiger Ablauf statt Live-Reaction-Lärm.</p>
       <div class="feature-list reveal delay-3">
-        <div class="feature-row" style="--tone:var(--pink)"><div class="icon">1</div><div><h3>Vorauswahl</h3><p>Nominieren oder Veto im 2×3 Raster.</p></div></div>
-        <div class="feature-row" style="--tone:var(--blue)"><div class="icon">2</div><div><h3>Finalrunde</h3><p>Like oder Pass für die Shortlist.</p></div></div>
-        <div class="feature-row" style="--tone:var(--green)"><div class="icon">✓</div><div><h3>Deterministisches Ergebnis</h3><p>Seed-basierte Tie-Breaker, cloudseitige Lifecycle-Claims.</p></div></div>
+        <div class="feature-row" style="--tone:var(--pink)"> <div class="icon">1</div> <div><h3>Vorauswahl</h3>              <p>Nominieren oder Veto im 2×3 Raster.</p></div></div>
+        <div class="feature-row" style="--tone:var(--blue)"> <div class="icon">2</div> <div><h3>Finalrunde</h3>              <p>Like oder Pass für die Shortlist.</p></div></div>
+        <div class="feature-row" style="--tone:var(--green)"><div class="icon">✓</div> <div><h3>Deterministisches Ergebnis</h3><p>Seed-basierte Tie-Breaker, cloudseitige Lifecycle-Claims.</p></div></div>
       </div>
     </div>
     <div class="visuals reveal delay-2">
@@ -411,6 +844,7 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
   </div>
 </section>
 
+<!-- ── 11 MATURITY ─────────────────────────────────────────── -->
 <section class="slide" id="slide-11" data-title="Maturity">
   <div class="kicker-number">11</div>
   <div class="slide-inner grid-2">
@@ -420,24 +854,25 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
       <div class="metric-caption reveal delay-2">Produktions-LOC · plus 2.524 Test-LOC</div>
       <div class="stat-strip reveal delay-3">
         <div class="stat"><strong>210</strong><span>Swift-Dateien</span></div>
-        <div class="stat"><strong>3</strong><span>soziale Scopes</span></div>
-        <div class="stat"><strong>4</strong><span>adaptive Tabs</span></div>
-        <div class="stat"><strong>1</strong><span>geschlossener Flow</span></div>
+        <div class="stat"><strong>3</strong>  <span>soziale Scopes</span></div>
+        <div class="stat"><strong>4</strong>  <span>adaptive Tabs</span></div>
+        <div class="stat"><strong>1</strong>  <span>geschlossener Flow</span></div>
       </div>
     </div>
     <div class="card reveal delay-2" style="padding:32px">
       <h3 style="font-size:34px;margin-bottom:12px">Kein Mockup.<br>Ein gewachsener Pre-Release-Build.</h3>
       <p>Die Architektur ist weitgehend in spezialisierte Dateien zerlegt. Sichtbare Komplexität bleibt bewusst in einigen Screen-Shells und Orchestratoren.</p>
       <div class="bar-chart">
-        <div class="bar-row"><span>Views</span><div class="bar"><i style="--w:93%"></i></div><b>20.800</b></div>
-        <div class="bar-row"><span>ViewModels</span><div class="bar"><i style="--w:46%"></i></div><b>10.186</b></div>
-        <div class="bar-row"><span>Services</span><div class="bar"><i style="--w:44%"></i></div><b>9.671</b></div>
-        <div class="bar-row"><span>Models</span><div class="bar"><i style="--w:13%"></i></div><b>2.881</b></div>
+        <div class="bar-row"><span>Views</span>      <div class="bar"><i style="--w:93%"></i></div><b>20.800</b></div>
+        <div class="bar-row"><span>ViewModels</span> <div class="bar"><i style="--w:46%"></i></div><b>10.186</b></div>
+        <div class="bar-row"><span>Services</span>   <div class="bar"><i style="--w:44%"></i></div><b>9.671</b></div>
+        <div class="bar-row"><span>Models</span>     <div class="bar"><i style="--w:13%"></i></div><b>2.881</b></div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ── 12 CLOSE ────────────────────────────────────────────── -->
 <section class="slide" id="slide-12" data-title="Close">
   <div class="kicker-number">12</div>
   <div class="slide-inner grid-2">
@@ -457,40 +892,88 @@ h2{font-size:clamp(48px,6.2vw,110px);max-width:1150px;margin-bottom:24px}
 </section>
 
 <script>
-const slides=[...document.querySelectorAll('.slide')];
-const progress=document.getElementById('progress');
-const current=document.getElementById('current');
-let active=0;
-const io=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
+/* ── INTERSECTION OBSERVER ──────────────────────────────────── */
+const slides   = [...document.querySelectorAll('.slide')];
+const progress = document.getElementById('progress');
+const current  = document.getElementById('current');
+let active = 0;
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
       entry.target.classList.add('is-visible');
-      const idx=slides.indexOf(entry.target);
-      if(idx>=0){active=idx;current.textContent=String(idx+1).padStart(2,'0');}
+      const idx = slides.indexOf(entry.target);
+      if (idx >= 0) {
+        active = idx;
+        current.textContent = String(idx + 1).padStart(2,'0');
+      }
     }
   });
-},{threshold:.42});
-slides.forEach(s=>io.observe(s));
-function updateProgress(){
-  const max=document.documentElement.scrollHeight-innerHeight;
-  progress.style.width=(max>0?scrollY/max*100:0)+'%';
+}, { threshold: 0.35 });
+
+slides.forEach(s => io.observe(s));
+
+/* ── PROGRESS BAR ───────────────────────────────────────────── */
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
 }
-addEventListener('scroll',updateProgress,{passive:true});updateProgress();
-function go(delta){
-  const idx=Math.max(0,Math.min(slides.length-1,active+delta));
-  slides[idx].scrollIntoView({behavior:'smooth',block:'start'});
+addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+function go(delta) {
+  const idx = Math.max(0, Math.min(slides.length - 1, active + delta));
+  slides[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-document.getElementById('prev').onclick=()=>go(-1);
-document.getElementById('next').onclick=()=>go(1);
-document.getElementById('fs').onclick=()=>{
-  if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();
+document.getElementById('prev').onclick = () => go(-1);
+document.getElementById('next').onclick = () => go(1);
+document.getElementById('fs').onclick = () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
 };
-addEventListener('keydown',e=>{
-  if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
-  if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
-  if(e.key==='Home')slides[0].scrollIntoView({behavior:'smooth'});
-  if(e.key==='End')slides.at(-1).scrollIntoView({behavior:'smooth'});
+addEventListener('keydown', e => {
+  if (['ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); go(1);  }
+  if (['ArrowUp','PageUp'].includes(e.key))          { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') slides[0].scrollIntoView({ behavior: 'smooth' });
+  if (e.key === 'End')  slides.at(-1).scrollIntoView({ behavior: 'smooth' });
+});
+
+/* ── ORBS: fade in on load ──────────────────────────────────── */
+document.querySelectorAll('.orb').forEach(orb => {
+  // animation handles opacity, just kick off the animation
+});
+
+/* ── PARALLAX KICKER NUMBERS ────────────────────────────────── */
+let ticking = false;
+addEventListener('scroll', () => {
+  if (ticking) return;
+  requestAnimationFrame(() => {
+    slides.forEach(slide => {
+      const kicker = slide.querySelector('.kicker-number');
+      if (!kicker) return;
+      const rect = slide.getBoundingClientRect();
+      const progress = 1 - (rect.top / innerHeight);
+      if (progress > -0.3 && progress < 1.5) {
+        kicker.style.transform = `translateY(${(1 - progress) * 30}px)`;
+      }
+    });
+    ticking = false;
+  });
+  ticking = true;
+}, { passive: true });
+
+/* ── SUBTLE CARD TILT ON HOVER ──────────────────────────────── */
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - .5;
+    const y = (e.clientY - r.top)  / r.height - .5;
+    card.style.transform = `translateY(-3px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
 });
 </script>
 </body>

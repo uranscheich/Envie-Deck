@@ -3,1111 +3,1461 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050506">
+<meta name="theme-color" content="#111522">
 <title>Envie — Interactive Pitch Deck</title>
-<meta name="description" content="Envie: Rezepte importieren, gemeinsam entscheiden, planen, einkaufen und kochen.">
+<meta name="description" content="Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen.">
 <style>
-/* ── TOKENS ─────────────────────────────────────────────────── */
 :root {
-  --bg:#050506;
-  --surface:#111114;
-  --surface-2:#18181d;
-  --line:rgba(255,255,255,.09);
-  --text:#f7f7f5;
-  --muted:#aaaab3;
-  --pink:#ff4d8d;
-  --pink-soft:#f09aa3;
-  --blue:#23b8f5;
-  --green:#83d8ad;
-  --amber:#f1b858;
-  --radius:24px;
-  --shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+  --pink: #ff3378;
+  --pink-soft: #ff8fb4;
+  --blue: #19a6ff;
+  --blue-soft: #8fd8ff;
+  --navy: #141b2d;
+  --ink: #171827;
+  --paper: #f1efeb;
+  --paper-2: #e7e4df;
+  --white: #ffffff;
+  --muted-dark: #9aa0b2;
+  --muted-light: #666a76;
+  --line-dark: rgba(255,255,255,.12);
+  --line-light: rgba(20,27,45,.12);
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --shadow-phone: 0 48px 110px rgba(6,10,22,.34), 0 8px 28px rgba(6,10,22,.20);
 }
 
-/* ── RESET ────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--bg); scroll-behavior: smooth; overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--navy); }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
   overflow-x: hidden;
-  /* fix overscroll */
+  background: var(--navy);
+  color: var(--white);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
 }
-a { color: inherit; text-decoration: none; }
-button { font: inherit; }
+button, a { font: inherit; color: inherit; }
+a { text-decoration: none; }
+img { display: block; max-width: 100%; }
+svg { display: block; }
 
-/* ── AMBIENT GRADIENT BG ─────────────────────────────────────── */
-.ambient-orbs { position: fixed; inset: 0; z-index: -5; pointer-events: none; overflow: hidden; }
-.orb { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; animation: orb-float linear infinite; }
-.orb-1 { width: 60vw; height: 60vw; left: -15vw; top: 10vh; background: radial-gradient(circle, rgba(255,77,141,.18) 0%, transparent 70%); animation-duration: 28s; }
-.orb-2 { width: 50vw; height: 50vw; right: -10vw; top: 40vh; background: radial-gradient(circle, rgba(35,184,245,.15) 0%, transparent 70%); animation-duration: 34s; animation-delay: -8s; }
-.orb-3 { width: 40vw; height: 40vw; left: 30vw; bottom: 10vh; background: radial-gradient(circle, rgba(131,216,173,.08) 0%, transparent 70%); animation-duration: 22s; animation-delay: -14s; }
-@keyframes orb-float {
-  0%   { transform: translate(0px, 0px) scale(1); }
-  33%  { transform: translate(4vw, -3vh) scale(1.06); }
-  66%  { transform: translate(-3vw, 4vh) scale(.94); }
-  100% { transform: translate(0px, 0px) scale(1); }
+.icon {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* ── NAV ─────────────────────────────────────────────────────── */
+.progress {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 0;
+  height: 3px;
+  z-index: 300;
+  background: linear-gradient(90deg, var(--pink), var(--blue));
+  box-shadow: 0 0 18px rgba(255,51,120,.45);
+}
+
 .deck-nav {
-  position: fixed; top: 22px; left: 24px; right: 24px;
-  z-index: 100; display: flex; align-items: center; justify-content: space-between;
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: 18px;
+  right: 18px;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   pointer-events: none;
 }
-.brand, .deck-controls { pointer-events: auto; }
-.brand { display: flex; align-items: center; gap: 12px; font-weight: 760; letter-spacing: -.02em; }
-.brand-mark { position: relative; width: 34px; height: 26px; }
-.brand-mark i { position: absolute; display: block; width: 20px; height: 26px; border-radius: 7px; transition: transform .4s cubic-bezier(.2,.8,.2,1); }
-.brand-mark i:first-child { left: 0; background: var(--pink); }
-.brand-mark i:last-child { right: 0; background: var(--blue); }
-.brand:hover .brand-mark i:first-child { transform: rotate(-8deg) translateX(-2px); }
-.brand:hover .brand-mark i:last-child { transform: rotate(8deg) translateX(2px); }
-.brand small { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.brand-text { display: flex; flex-direction: column; line-height: 1; }
-.deck-controls {
-  display: flex; gap: 8px; padding: 6px;
-  border: 1px solid var(--line);
-  background: rgba(8,8,10,.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+.brand,
+.deck-controls { pointer-events: auto; }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 13px 9px 10px;
   border-radius: 999px;
+  background: rgba(11,14,24,.70);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+}
+.brand-mark {
+  position: relative;
+  width: 32px;
+  height: 25px;
+}
+.brand-mark span {
+  position: absolute;
+  top: 0;
+  width: 19px;
+  height: 25px;
+  border-radius: 7px;
+  transition: transform .45s var(--ease);
+}
+.brand-mark span:first-child { left: 1px; background: var(--pink); transform: rotate(-5deg); }
+.brand-mark span:last-child { right: 1px; background: var(--blue); transform: rotate(5deg); }
+.brand:hover .brand-mark span:first-child { transform: rotate(-11deg) translateX(-2px); }
+.brand:hover .brand-mark span:last-child { transform: rotate(11deg) translateX(2px); }
+.brand-copy { display: grid; line-height: 1; gap: 3px; }
+.brand-copy strong { font-size: 16px; letter-spacing: -.03em; }
+.brand-copy small {
+  color: rgba(255,255,255,.56);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.deck-controls {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(11,14,24,.70);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
 }
 .deck-controls button {
-  border: 0; background: transparent; color: var(--muted);
-  width: 36px; height: 36px; border-radius: 50%;
-  cursor: pointer; transition: all .2s ease;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: rgba(255,255,255,.72);
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .2s var(--ease);
 }
-.deck-controls button:hover { color: #fff; background: rgba(255,255,255,.1); }
-.deck-controls button:active { transform: scale(.88); }
+.deck-controls button:hover { background: rgba(255,255,255,.11); color: var(--white); }
+.deck-controls button:active { transform: scale(.9); }
+.deck-controls .icon { width: 17px; height: 17px; }
 
-/* ── PROGRESS ─────────────────────────────────────────────────── */
-.progress {
-  position: fixed; top: 0; left: 0; height: 2px;
-  background: linear-gradient(90deg, var(--pink), var(--blue), var(--green));
-  background-size: 200% 100%;
-  width: 0; z-index: 120;
-  transition: width .08s linear;
-  animation: pshimmer 3s linear infinite;
-  box-shadow: 0 0 10px rgba(255,77,141,.5);
-}
-@keyframes pshimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-
-/* ── SLIDE COUNTER ────────────────────────────────────────────── */
 .slide-counter {
-  position: fixed; right: 28px; bottom: 24px; z-index: 90;
-  color: var(--muted); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+  position: fixed;
+  z-index: 220;
+  right: 22px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  min-width: 72px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(11,14,24,.68);
+  border: 1px solid rgba(255,255,255,.11);
+  color: rgba(255,255,255,.62);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: .14em;
+  text-align: center;
   font-variant-numeric: tabular-nums;
-  background: rgba(8,8,10,.7); backdrop-filter: blur(12px);
-  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
 }
 
-/* ── SLIDES ───────────────────────────────────────────────────── */
 .slide {
-  min-height: 100svh; position: relative; isolation: isolate;
-  display: flex; align-items: center;
-  padding: 96px clamp(20px,5vw,86px) 70px;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  overflow: hidden; /* prevents any inner overflow from escaping */
+  --slide-bg: var(--navy);
+  --slide-text: var(--white);
+  --slide-muted: var(--muted-dark);
+  --slide-line: var(--line-dark);
+  min-height: 100svh;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 104px clamp(22px, 5vw, 86px) 72px;
+  background: var(--slide-bg);
+  color: var(--slide-text);
 }
-.slide-inner { width: min(1500px,100%); margin: 0 auto; }
+.slide::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--slide-line);
+  opacity: .55;
+}
+.slide.light {
+  --slide-bg: var(--paper);
+  --slide-text: var(--ink);
+  --slide-muted: var(--muted-light);
+  --slide-line: var(--line-light);
+}
+.slide.dark {
+  --slide-bg: var(--navy);
+  --slide-text: var(--white);
+  --slide-muted: var(--muted-dark);
+  --slide-line: var(--line-dark);
+}
+.slide-inner {
+  width: min(1480px, 100%);
+  margin: 0 auto;
+  position: relative;
+  z-index: 3;
+}
 
-/* ── EYEBROW ─────────────────────────────────────────────────── */
+.slide-wash,
+.slide-grid,
+.card-sculpture,
+.ring,
+.color-field {
+  position: absolute;
+  pointer-events: none;
+}
+.slide-wash {
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(255,51,120,.18), transparent 32%),
+    radial-gradient(circle at 88% 78%, rgba(25,166,255,.16), transparent 34%);
+}
+.slide.light .slide-wash {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255,51,120,.13), transparent 34%),
+    radial-gradient(circle at 92% 84%, rgba(25,166,255,.14), transparent 36%);
+}
+.slide-grid {
+  inset: 0;
+  z-index: -1;
+  opacity: .17;
+  background-image:
+    linear-gradient(to right, var(--slide-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--slide-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+}
+
 .eyebrow {
-  display: flex; align-items: center; gap: 10px;
-  color: var(--pink-soft); font-weight: 780;
-  text-transform: uppercase; letter-spacing: .16em;
-  font-size: 12px; margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  color: var(--pink);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 820;
+  letter-spacing: .18em;
+  text-transform: uppercase;
 }
-.eyebrow::before { content: ""; flex-shrink: 0; width: 24px; height: 2px; background: currentColor; border-radius: 2px; }
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 2px;
+  border-radius: 99px;
+  background: currentColor;
+}
 
-/* ── TYPOGRAPHY ──────────────────────────────────────────────── */
 h1, h2, h3, p { margin-top: 0; }
-h1, h2 { font-weight: 820; letter-spacing: -.055em; line-height: .93; text-wrap: balance; }
-h1 { font-size: clamp(48px,8.4vw,148px); max-width: 1050px; margin-bottom: 26px; }
-h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px; }
-.lede { font-size: clamp(16px,1.6vw,24px); line-height: 1.5; color: #c9c9ce; max-width: 780px; }
-
+h1, h2 {
+  margin-bottom: 24px;
+  font-weight: 860;
+  line-height: .92;
+  letter-spacing: -.06em;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(58px, 8.8vw, 148px); max-width: 980px; }
+h2 { font-size: clamp(44px, 6.5vw, 108px); max-width: 1160px; }
+h3 { letter-spacing: -.035em; }
+.lede {
+  max-width: 760px;
+  margin-bottom: 0;
+  color: var(--slide-muted);
+  font-size: clamp(17px, 1.55vw, 24px);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
 .gradient-text {
   color: transparent;
-  background: linear-gradient(90deg,#fff 0%,#fff 24%,var(--pink-soft) 63%,var(--blue) 100%);
-  -webkit-background-clip: text; background-clip: text;
+  background: linear-gradient(105deg, var(--pink) 0%, var(--pink-soft) 42%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.stroke-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px currentColor;
+  opacity: .25;
 }
 
-/* ── LAYOUTS ─────────────────────────────────────────────────── */
 .grid-2 {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,.95fr);
-  gap: clamp(28px,6vw,100px); align-items: center;
+  grid-template-columns: minmax(0, .9fr) minmax(480px, 1.1fr);
+  gap: clamp(38px, 6vw, 100px);
+  align-items: center;
 }
-.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+.grid-2.reverse { grid-template-columns: minmax(480px, 1.1fr) minmax(0, .9fr); }
 
-/* ── CARDS ─────────────────────────────────────────────────────
-   NO ::before pseudo with border-radius—that was the square bug.
-   Use box-shadow + background for glass effect instead.           */
-.card {
-  background: linear-gradient(160deg, rgba(255,255,255,.075) 0%, rgba(255,255,255,.028) 100%);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 26px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 2px 8px rgba(0,0,0,.35);
-  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+.hero-copy { position: relative; z-index: 2; }
+.hero-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+.hero-kicker span {
+  padding: 10px 14px;
+  border: 1px solid var(--slide-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--slide-bg) 88%, transparent);
+  color: var(--slide-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+.phone-stage {
+  min-height: 650px;
   position: relative;
+  perspective: 1200px;
+}
+.device {
+  position: absolute;
+  width: min(29vw, 318px);
+  aspect-ratio: 709 / 1536;
+  padding: 7px;
+  border-radius: 42px;
+  background: linear-gradient(150deg, rgba(255,255,255,.36), rgba(255,255,255,.08) 32%, rgba(255,255,255,.18) 76%, rgba(255,255,255,.05));
+  box-shadow: var(--shadow-phone);
+  transform-origin: center;
+  transition: transform .75s var(--ease), filter .75s var(--ease), box-shadow .75s var(--ease);
+}
+.device::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 35px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+  pointer-events: none;
+}
+.device-screen {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 35px;
+  background:
+    linear-gradient(160deg, rgba(255,51,120,.18), rgba(25,166,255,.16)),
+    #222838;
+}
+.device-screen img { width: 100%; height: 100%; object-fit: cover; }
+.phone-stage .device:nth-child(1) { left: 1%; top: 17%; transform: rotate(-9deg) translateZ(-80px); }
+.phone-stage .device:nth-child(2) { left: 50%; top: 2%; z-index: 3; transform: translateX(-50%) scale(1.04); }
+.phone-stage .device:nth-child(3) { right: 1%; top: 19%; transform: rotate(9deg) translateZ(-80px); }
+.phone-stage:hover .device:nth-child(1) { transform: rotate(-13deg) translate(-18px,-8px) translateZ(-70px); }
+.phone-stage:hover .device:nth-child(2) { transform: translateX(-50%) translateY(-14px) scale(1.075); }
+.phone-stage:hover .device:nth-child(3) { transform: rotate(13deg) translate(18px,-8px) translateZ(-70px); }
+
+.card-sculpture { inset: auto -3vw 3vh auto; width: min(50vw, 720px); height: min(50vw, 720px); z-index: 0; }
+.card-sculpture span {
+  position: absolute;
+  width: 46%;
+  height: 64%;
+  border-radius: 42px;
+  filter: saturate(110%);
+  box-shadow: 0 30px 90px rgba(0,0,0,.18);
+}
+.card-sculpture span:first-child { left: 13%; top: 17%; background: linear-gradient(145deg, #ff4a86, #ff2c74); transform: rotate(-17deg); }
+.card-sculpture span:last-child { right: 12%; top: 10%; background: linear-gradient(145deg, #42b9ff, #1297f0); transform: rotate(15deg); }
+
+.problem-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .84fr) minmax(420px, 1.16fr);
+  gap: clamp(40px, 7vw, 120px);
+  align-items: center;
+}
+.problem-list { margin-top: 44px; }
+.problem-item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid var(--slide-line);
+}
+.problem-item:last-child { border-bottom: 1px solid var(--slide-line); }
+.problem-num {
+  color: var(--pink);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .16em;
+}
+.problem-item p {
+  margin: 0;
+  color: var(--slide-text);
+  font-size: clamp(18px, 1.5vw, 24px);
+  line-height: 1.38;
+  letter-spacing: -.02em;
+}
+.problem-visual {
+  position: relative;
+  min-height: 650px;
+}
+.problem-visual .device:first-child { left: 7%; top: 14%; transform: rotate(-7deg); }
+.problem-visual .device:last-child { right: 4%; top: 2%; z-index: 2; transform: rotate(6deg) scale(1.08); }
+.problem-visual::before {
+  content: "";
+  position: absolute;
+  width: 72%;
+  aspect-ratio: 1;
+  right: 2%;
+  top: 10%;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255,51,120,.20), rgba(25,166,255,.18));
+  filter: blur(2px);
+}
+
+.editorial-flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin-top: 54px;
+  border-top: 1px solid var(--slide-line);
+  border-bottom: 1px solid var(--slide-line);
+}
+.flow-step {
+  position: relative;
+  min-height: 310px;
+  padding: 26px 22px 28px;
+  border-right: 1px solid var(--slide-line);
   overflow: hidden;
 }
-/* subtle inner highlight via inset gradient on the border */
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.1);
-}
-.card h3 { font-size: 22px; letter-spacing: -.03em; margin-bottom: 8px; }
-.card p { color: var(--muted); line-height: 1.5; margin: 0; }
-
-/* ── PILLS ───────────────────────────────────────────────────── */
-.pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
-.pill {
-  border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px;
-  color: #d6d6da; font-size: 13px; background: rgba(255,255,255,.045);
-  transition: background .2s, border-color .2s;
-}
-.pill:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); }
-
-/* ── PHONE STAGE ─────────────────────────────────────────────── */
-.phone-stage { position: relative; min-height: 620px; }
-.phone {
+.flow-step:last-child { border-right: 0; }
+.flow-step::after {
+  content: "";
   position: absolute;
-  width: min(30vw, 320px); aspect-ratio: 709/1536;
-  border-radius: 38px; overflow: hidden;
-  background: #000; border: 1px solid rgba(255,255,255,.16);
-  box-shadow: var(--shadow); transform-origin: center;
-  transition: transform .7s cubic-bezier(.2,.8,.2,1), box-shadow .7s ease;
-  will-change: transform;
+  inset: auto 0 0;
+  height: 5px;
+  background: var(--tone);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease);
 }
-.phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.phone.a { left: 2%; top: 15%; transform: rotate(-7deg); }
-.phone.b { left: 34%; top: 2%; z-index: 2; transform: translateY(-2%) scale(1.05); }
-.phone.c { right: 2%; top: 17%; transform: rotate(7deg); }
-.phone-stage:hover .phone.a { transform: rotate(-11deg) translate(-12px,-10px); box-shadow: 0 60px 130px rgba(0,0,0,.7); }
-.phone-stage:hover .phone.b { transform: translateY(-6%) scale(1.1); box-shadow: 0 70px 150px rgba(0,0,0,.8); }
-.phone-stage:hover .phone.c { transform: rotate(11deg) translate(12px,-10px); box-shadow: 0 60px 130px rgba(0,0,0,.7); }
-@keyframes pf-a { 0%,100% { translate: 0 0; } 50% { translate: -4px 6px; } }
-@keyframes pf-b { 0%,100% { translate: 0 0; } 50% { translate: 2px -8px; } }
-@keyframes pf-c { 0%,100% { translate: 0 0; } 50% { translate: 5px 5px; } }
-.phone-stage:not(:hover) .phone.a { animation: pf-a 7s ease-in-out infinite; }
-.phone-stage:not(:hover) .phone.b { animation: pf-b 9s ease-in-out infinite; }
-.phone-stage:not(:hover) .phone.c { animation: pf-c 8s ease-in-out infinite; }
-
-/* ── STAT STRIP ──────────────────────────────────────────────── */
-.stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 34px; }
-.stat { padding: 18px 20px; border-radius: 20px; background: rgba(255,255,255,.04); border: 1px solid var(--line); transition: background .3s; }
-.stat:hover { background: rgba(255,255,255,.07); }
-.stat strong {
-  display: block; font-size: clamp(22px,2.5vw,42px); letter-spacing: -.04em;
-  background: linear-gradient(135deg, #fff 20%, var(--muted));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+.slide.is-visible .flow-step::after { transform: scaleX(1); }
+.flow-step:nth-child(2)::after { transition-delay: .08s; }
+.flow-step:nth-child(3)::after { transition-delay: .16s; }
+.flow-step:nth-child(4)::after { transition-delay: .24s; }
+.flow-step:nth-child(5)::after { transition-delay: .32s; }
+.flow-index {
+  color: var(--tone);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .18em;
 }
-.stat span { color: var(--muted); font-size: 13px; }
-
-/* ── PROBLEM STACK ───────────────────────────────────────────── */
-.problem-stack { display: grid; gap: 12px; margin-top: 28px; }
-.problem { display: flex; gap: 15px; align-items: flex-start; padding: 17px 0; border-top: 1px solid var(--line); }
-.problem-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; flex: 0 0 auto; }
-.problem p { margin: 0; color: #d3d3d7; font-size: 18px; line-height: 1.45; }
-
-/* ── PHONE STATICS ───────────────────────────────────────────── */
-.dual-phones { display: grid; grid-template-columns: repeat(2,minmax(0,360px)); justify-content: center; gap: 24px; align-items: end; }
-.triple-phones { display: grid; grid-template-columns: repeat(3,minmax(0,280px)); gap: 20px; justify-content: center; align-items: end; }
-.phone-static {
-  border-radius: 34px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: var(--shadow); background: #000;
-  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease;
-  flex-shrink: 0;
+.flow-icon {
+  width: 48px;
+  height: 48px;
+  margin: 30px 0 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid var(--slide-line);
+  color: var(--tone);
 }
-.phone-static:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 60px 120px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.12); }
-.phone-static img { width: 100%; display: block; }
+.flow-icon .icon { width: 23px; height: 23px; }
+.flow-step h3 { margin-bottom: 12px; font-size: 25px; }
+.flow-step p { margin: 0; color: var(--slide-muted); font-size: 14px; line-height: 1.5; }
 
-/* ── FEATURE ROWS ────────────────────────────────────────────── */
-.feature-list { display: grid; gap: 16px; margin-top: 28px; }
-.feature-row { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
-.feature-row .icon {
-  width: 44px; height: 44px; border-radius: 14px;
-  background: rgba(255,255,255,.06); display: grid; place-items: center;
-  color: var(--tone); font-weight: 900; font-size: 16px;
-  border: 1px solid rgba(255,255,255,.08);
-  transition: background .3s, transform .3s;
+.scope-stage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 44px;
 }
-.feature-row:hover .icon { background: rgba(255,255,255,.11); transform: scale(1.08); }
-.feature-row h3 { font-size: 20px; margin: 1px 0 5px; }
-.feature-row p { margin: 0; color: var(--muted); line-height: 1.5; }
-
-/* ── TECH GRID ───────────────────────────────────────────────── */
-.tech-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 32px; }
-.tech { display: flex; justify-content: space-between; gap: 18px; align-items: flex-end; }
-.tech b { font-size: 18px; }
-.tech span { color: var(--muted); font-size: 13px; text-align: right; line-height: 1.4; }
-
-/* ── SCOPE CARDS ─────────────────────────────────────────────── */
-.scope-card {
-  min-height: 240px; display: flex; flex-direction: column;
-  justify-content: space-between; overflow: hidden; position: relative;
+.scope-panel {
+  position: relative;
+  min-height: 440px;
+  padding: 30px;
+  overflow: hidden;
+  border-radius: 34px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--slide-line);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .45s var(--ease), background .45s ease;
 }
-/* accent glow in corner — no border-radius bug, just a soft radial bg */
-.scope-card .scope-glow {
-  position: absolute; right: -40px; bottom: -80px;
-  width: 200px; height: 200px;
-  background: radial-gradient(circle at center, var(--tone) 0%, transparent 70%);
-  opacity: .18; pointer-events: none;
-  transition: opacity .4s;
+.light .scope-panel { background: rgba(255,255,255,.44); box-shadow: 0 22px 50px rgba(35,39,52,.06); }
+.scope-panel:hover { transform: translateY(-7px); background: rgba(255,255,255,.075); }
+.light .scope-panel:hover { background: rgba(255,255,255,.72); }
+.scope-panel::before {
+  content: "";
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  right: -100px;
+  bottom: -130px;
+  border-radius: 50%;
+  background: var(--tone);
+  opacity: .15;
+  filter: blur(4px);
 }
-.scope-card:hover .scope-glow { opacity: .3; }
-.scope-card .num { font-size: 12px; color: var(--muted); letter-spacing: .18em; }
-.scope-card h3 { font-size: 30px; }
-
-/* ── MODE CARDS ──────────────────────────────────────────────── */
-.mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 28px; }
-.mode-card strong { font-size: 46px; display: block; letter-spacing: -.05em; color: var(--tone); }
-.mode-card span { color: #fff; font-size: 18px; font-weight: 730; }
-.mode-card p { margin-top: 8px; }
-
-/* ── METRIC HERO ─────────────────────────────────────────────── */
-.metric-hero {
-  font-size: clamp(60px,11vw,200px); font-weight: 850; letter-spacing: -.075em; line-height: .85;
-  background: linear-gradient(135deg, #fff 30%, var(--pink-soft) 70%, var(--blue));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+.scope-panel header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.scope-panel .scope-number { color: var(--tone); font-size: 11px; font-weight: 850; letter-spacing: .18em; }
+.scope-symbol {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tone) 35%, transparent);
 }
-.metric-caption { color: var(--muted); font-size: 16px; margin-top: 18px; }
+.scope-symbol .icon { width: 21px; height: 21px; }
+.scope-panel h3 { margin: 68px 0 18px; font-size: clamp(38px, 3.7vw, 64px); line-height: .95; }
+.scope-panel p { max-width: 330px; margin: 0; color: var(--slide-muted); line-height: 1.5; }
+.scope-meta {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.scope-meta span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--slide-line);
+  color: var(--slide-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.mode-line {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 22px;
+  border-top: 1px solid var(--slide-line);
+  border-bottom: 1px solid var(--slide-line);
+}
+.mode-item { padding: 18px 0; display: flex; align-items: baseline; gap: 12px; }
+.mode-item + .mode-item { padding-left: 22px; border-left: 1px solid var(--slide-line); }
+.mode-item strong { color: var(--tone); font-size: 30px; letter-spacing: -.05em; }
+.mode-item span { color: var(--slide-muted); font-size: 13px; font-weight: 720; }
 
-/* ── BAR CHART ───────────────────────────────────────────────── */
-.bar-chart { display: grid; gap: 14px; margin-top: 36px; }
-.bar-row { display: grid; grid-template-columns: 110px 1fr 65px; gap: 12px; align-items: center; font-size: 13px; color: var(--muted); }
-.bar { height: 6px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
-.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--pink), var(--blue)); border-radius: inherit; transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
-.slide.is-visible .bar i { width: var(--w); }
+.match-stage {
+  display: grid;
+  grid-template-columns: minmax(0, .78fr) minmax(560px, 1.22fr);
+  gap: clamp(36px, 6vw, 90px);
+  align-items: center;
+}
+.match-visual {
+  min-height: 680px;
+  position: relative;
+}
+.match-visual .ring {
+  width: 560px;
+  height: 560px;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.12);
+  box-shadow: 0 0 0 40px rgba(255,255,255,.025), 0 0 0 80px rgba(255,255,255,.018);
+}
+.match-visual::before,
+.match-visual::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 64%;
+  border-radius: 40px;
+  filter: blur(.2px);
+}
+.match-visual::before { left: 4%; background: linear-gradient(145deg, var(--pink), #ff5e96); transform: translateY(-50%) rotate(-12deg); }
+.match-visual::after { right: 4%; background: linear-gradient(145deg, var(--blue), #57c3ff); transform: translateY(-50%) rotate(12deg); }
+.match-visual .device { width: min(27vw, 300px); top: 50%; }
+.match-visual .device.left { left: 18%; transform: translate(-50%,-50%) rotate(-6deg); z-index: 2; }
+.match-visual .device.right { right: 18%; transform: translate(50%,-50%) rotate(6deg); z-index: 3; }
+.match-rule {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  color: var(--slide-muted);
+  font-size: 13px;
+  font-weight: 760;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.match-rule::before,
+.match-rule::after { content: ""; height: 1px; background: var(--slide-line); }
+.match-cards { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.match-card {
+  padding: 20px;
+  border: 1px solid var(--slide-line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.04);
+}
+.match-card strong { display: block; margin-bottom: 6px; font-size: 17px; }
+.match-card span { color: var(--slide-muted); font-size: 13px; line-height: 1.4; }
 
-/* ── CTA ─────────────────────────────────────────────────────── */
-.cta {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 18px 32px; border-radius: 999px;
-  background: linear-gradient(90deg, var(--pink), #fa7ca5);
-  color: #fff; font-weight: 800; font-size: 16px;
-  box-shadow: 0 12px 40px rgba(255,77,141,.28), inset 0 1px rgba(255,255,255,.2);
+.plan-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+}
+.plan-head .lede { max-width: 650px; }
+.plan-stage {
+  position: relative;
+  min-height: 650px;
   margin-top: 28px;
-  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
-  position: relative; overflow: hidden;
 }
-.cta::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%);
-  transform: translateX(-100%); transition: transform .6s ease;
+.plan-stage::before {
+  content: "";
+  position: absolute;
+  inset: 18% 5% 4%;
+  border-radius: 50%;
+  background: linear-gradient(100deg, rgba(255,51,120,.20), rgba(25,166,255,.20));
+  filter: blur(70px);
 }
-.cta:hover { transform: translateY(-2px); box-shadow: 0 20px 60px rgba(255,77,141,.42), inset 0 1px rgba(255,255,255,.2); }
-.cta:hover::after { transform: translateX(100%); }
-.cta:active { transform: translateY(0); }
-
-/* ── FOOTER NOTE ─────────────────────────────────────────────── */
-.footer-note { position: absolute; left: clamp(20px,5vw,86px); bottom: 24px; color: #48484e; font-size: 11px; }
-
-/* ── REVEAL ANIMATIONS ───────────────────────────────────────── */
-.reveal { opacity: 0; transform: translateY(36px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
-.slide.is-visible .reveal { opacity: 1; transform: none; }
-.delay-1 { transition-delay: .10s; }
-.delay-2 { transition-delay: .20s; }
-.delay-3 { transition-delay: .32s; }
-.delay-4 { transition-delay: .46s; }
-
-/* ── KICKER NUMBERS ──────────────────────────────────────────── */
-.kicker-number {
-  position: absolute; right: 3vw; top: 8vh;
-  font-size: min(22vw,340px); font-weight: 900; letter-spacing: -.08em;
-  color: rgba(255,255,255,.022); z-index: -1; pointer-events: none; user-select: none;
-  opacity: 0; transform: translateY(16px);
-  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.2,.8,.2,1);
+.phone-row {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 290px));
+  justify-content: center;
+  align-items: end;
+  gap: 26px;
 }
-.slide.is-visible .kicker-number { opacity: 1; transform: translateY(0); }
+.phone-row .device { position: relative; width: 100%; }
+.phone-row .device:nth-child(1) { transform: rotate(-4deg) translateY(24px); }
+.phone-row .device:nth-child(2) { z-index: 3; transform: translateY(-26px) scale(1.04); }
+.phone-row .device:nth-child(3) { transform: rotate(4deg) translateY(24px); }
+.plan-caption {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  color: var(--slide-muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.plan-caption span + span::before { content: "/"; margin-right: 12px; opacity: .5; }
 
-/* ── SCROLL SNAP ─────────────────────────────────────────────── */
+.cooking-layout {
+  display: grid;
+  grid-template-columns: minmax(500px, 1.08fr) minmax(0, .92fr);
+  gap: clamp(38px, 6vw, 96px);
+  align-items: center;
+}
+.cooking-visual { min-height: 690px; position: relative; }
+.cooking-visual::before {
+  content: "";
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  left: 42%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255,51,120,.24), rgba(25,166,255,.20));
+}
+.cooking-visual .device { left: 42%; top: 50%; transform: translate(-50%,-50%) rotate(-4deg) scale(1.06); z-index: 2; }
+.timer-orbit {
+  position: absolute;
+  right: 6%;
+  top: 18%;
+  width: 180px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  background: rgba(20,27,45,.82);
+  border: 1px solid rgba(255,255,255,.15);
+  box-shadow: 0 30px 80px rgba(0,0,0,.28);
+  backdrop-filter: blur(20px);
+}
+.timer-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,.12);
+  border-top-color: var(--pink);
+  border-right-color: var(--blue);
+  transform: rotate(20deg);
+}
+.timer-orbit strong { font-size: 30px; letter-spacing: -.05em; }
+.cooking-points { margin-top: 38px; display: grid; gap: 0; }
+.cooking-point {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--slide-line);
+}
+.cooking-point:last-child { border-bottom: 1px solid var(--slide-line); }
+.cooking-point strong { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--pink); }
+.cooking-point span { color: var(--slide-muted); line-height: 1.45; }
+
+.import-layout {
+  display: grid;
+  grid-template-columns: minmax(0,.72fr) minmax(580px,1.28fr);
+  gap: clamp(42px, 6vw, 100px);
+  align-items: center;
+}
+.import-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.import-step {
+  min-height: 250px;
+  position: relative;
+  padding: 24px;
+  border-radius: 26px;
+  border: 1px solid var(--slide-line);
+  background: rgba(255,255,255,.04);
+  overflow: hidden;
+}
+.light .import-step { background: rgba(255,255,255,.52); }
+.import-step::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  right: -66px;
+  bottom: -76px;
+  border-radius: 50%;
+  background: var(--tone);
+  opacity: .15;
+}
+.import-step-top { display: flex; justify-content: space-between; align-items: center; color: var(--tone); }
+.import-step-top .icon { width: 25px; height: 25px; }
+.import-step-top span { font-size: 11px; font-weight: 850; letter-spacing: .16em; }
+.import-step h3 { margin: 72px 0 10px; font-size: 24px; }
+.import-step p { margin: 0; color: var(--slide-muted); font-size: 14px; line-height: 1.5; }
+.import-note {
+  margin-top: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--slide-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.import-note::before { content: ""; width: 42px; height: 1px; background: var(--slide-line); }
+
+.trust-layout {
+  display: grid;
+  grid-template-columns: minmax(0,.85fr) minmax(520px,1.15fr);
+  gap: clamp(42px,7vw,110px);
+  align-items: center;
+}
+.trust-diagram {
+  display: grid;
+  gap: 14px;
+  position: relative;
+}
+.trust-layer {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+.trust-label {
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tone) 30%, transparent);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.trust-content {
+  padding: 24px 26px;
+  border-radius: 22px;
+  border: 1px solid var(--slide-line);
+  background: rgba(255,255,255,.04);
+}
+.light .trust-content { background: rgba(255,255,255,.52); }
+.trust-content strong { display: block; margin-bottom: 7px; font-size: 22px; }
+.trust-content span { color: var(--slide-muted); line-height: 1.5; }
+.trust-bridge {
+  margin-left: 56px;
+  color: var(--slide-muted);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.trust-bridge::before { content: ""; display: inline-block; width: 70px; height: 1px; margin: 0 12px 3px 0; background: var(--slide-line); }
+
+.friends-flow {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.friend-phase {
+  position: relative;
+  min-height: 380px;
+  padding: 28px;
+  border-radius: 30px;
+  border: 1px solid var(--slide-line);
+  background: rgba(255,255,255,.045);
+  overflow: hidden;
+}
+.light .friend-phase { background: rgba(255,255,255,.56); }
+.friend-phase::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -100px;
+  top: -100px;
+  border-radius: 50%;
+  background: var(--tone);
+  opacity: .14;
+}
+.friend-phase-num { color: var(--tone); font-size: 11px; font-weight: 850; letter-spacing: .18em; }
+.friend-phase h3 { margin: 66px 0 16px; font-size: 34px; line-height: 1; }
+.friend-phase p { margin: 0; color: var(--slide-muted); line-height: 1.5; }
+.friend-tags { position: absolute; left: 28px; right: 28px; bottom: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+.friend-tags span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--slide-line);
+  color: var(--slide-muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.maturity-layout {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(460px,.86fr);
+  gap: clamp(45px,7vw,110px);
+  align-items: center;
+}
+.big-metric {
+  font-size: clamp(86px, 12vw, 200px);
+  font-weight: 900;
+  letter-spacing: -.085em;
+  line-height: .78;
+  color: transparent;
+  background: linear-gradient(110deg, var(--pink), var(--pink-soft) 44%, var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.metric-label { margin-top: 26px; color: var(--slide-muted); font-size: 16px; }
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 14px;
+  margin-top: 34px;
+}
+.metric-tile {
+  padding: 20px;
+  border: 1px solid var(--slide-line);
+  border-radius: 22px;
+  background: rgba(255,255,255,.04);
+}
+.metric-tile strong { display: block; font-size: 34px; letter-spacing: -.05em; }
+.metric-tile span { color: var(--slide-muted); font-size: 12px; }
+.maturity-card {
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid var(--slide-line);
+  background: rgba(255,255,255,.05);
+}
+.maturity-card h3 { margin-bottom: 10px; font-size: 32px; }
+.maturity-card > p { margin: 0 0 30px; color: var(--slide-muted); line-height: 1.5; }
+.bar-list { display: grid; gap: 16px; }
+.bar-row { display: grid; grid-template-columns: 94px 1fr 58px; gap: 12px; align-items: center; color: var(--slide-muted); font-size: 12px; }
+.bar-track { height: 5px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; }
+.light .bar-track { background: rgba(20,27,45,.08); }
+.bar-track i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pink), var(--blue)); transition: width 1.25s var(--ease); }
+.slide.is-visible .bar-track i { width: var(--w); }
+.bar-row b { color: var(--slide-text); text-align: right; font-variant-numeric: tabular-nums; }
+
+.close-layout { text-align: center; display: grid; justify-items: center; }
+.close-layout h2 { max-width: 980px; }
+.close-layout .lede { max-width: 700px; }
+.close-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 34px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--slide-line);
+  background: rgba(255,255,255,.05);
+  color: var(--slide-muted);
+  font-size: 13px;
+  font-weight: 760;
+}
+.close-lockup .brand-mark { transform: scale(.86); }
+.close-phones {
+  width: min(920px,100%);
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,260px));
+  justify-content: center;
+  gap: 22px;
+  align-items: end;
+}
+.close-phones .device { position: relative; width: 100%; }
+.close-phones .device:nth-child(1) { transform: rotate(-5deg) translateY(30px); }
+.close-phones .device:nth-child(2) { z-index: 2; transform: translateY(-14px) scale(1.03); }
+.close-phones .device:nth-child(3) { transform: rotate(5deg) translateY(30px); }
+.footer-note {
+  position: absolute;
+  left: clamp(22px,5vw,86px);
+  bottom: 22px;
+  color: var(--slide-muted);
+  opacity: .55;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity .85s ease, transform .95s var(--ease);
+}
+.slide.is-visible .reveal { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: .08s; }
+.delay-2 { transition-delay: .16s; }
+.delay-3 { transition-delay: .26s; }
+.delay-4 { transition-delay: .38s; }
+
 @media (min-width: 980px) {
   html, body { scroll-snap-type: y mandatory; }
   .slide { scroll-snap-align: start; scroll-snap-stop: always; }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   DIAGRAM COMPONENTS
-   ══════════════════════════════════════════════════════════════ */
-
-/* ── FLOW DIAGRAM (slide 3) ──────────────────────────────────── */
-.flow-diagram { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; margin-top: 52px; align-items: stretch; position: relative; }
-.flow-node {
-  display: flex; flex-direction: column; gap: 14px;
-  padding: 28px 20px; position: relative;
-}
-.flow-node::after { /* connector arrow */
-  content: ""; position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
-  width: 0; height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 10px solid rgba(255,255,255,.12);
-  z-index: 2;
-}
-.flow-node:last-child::after { display: none; }
-.flow-node-num { font-size: 11px; font-weight: 800; letter-spacing: .16em; color: var(--tone); text-transform: uppercase; }
-.flow-node-icon {
-  width: 52px; height: 52px; border-radius: 16px;
-  background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; transition: transform .35s ease;
-}
-.flow-node:hover .flow-node-icon { transform: scale(1.1); }
-.flow-node-title { font-size: 20px; font-weight: 740; letter-spacing: -.03em; }
-.flow-node-desc { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
-.flow-node-accent {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-  background: var(--tone); border-radius: 0 0 0 0; opacity: .6;
-  transform: scaleX(0); transition: transform .5s cubic-bezier(.2,.8,.2,1);
-  transform-origin: left;
-}
-.slide.is-visible .flow-node-accent { transform: scaleX(1); }
-.flow-node:nth-child(1) .flow-node-accent { transition-delay: .1s; }
-.flow-node:nth-child(2) .flow-node-accent { transition-delay: .2s; }
-.flow-node:nth-child(3) .flow-node-accent { transition-delay: .3s; }
-.flow-node:nth-child(4) .flow-node-accent { transition-delay: .4s; }
-.flow-node:nth-child(5) .flow-node-accent { transition-delay: .5s; }
-
-/* ── SOCIAL SCOPE DIAGRAM (slide 4) ─────────────────────────── */
-.scope-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
-.scope-block {
-  border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden;
-  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
-}
-.scope-block:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
-.scope-header { padding: 22px 22px 16px; position: relative; overflow: hidden; }
-.scope-header-bg {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(var(--tone-rgb),.14) 0%, transparent 70%);
-}
-.scope-header-label { font-size: 11px; font-weight: 800; letter-spacing: .18em; color: var(--tone); text-transform: uppercase; position: relative; }
-.scope-header-name { font-size: 28px; font-weight: 820; letter-spacing: -.04em; position: relative; }
-.scope-body { padding: 18px 22px 22px; background: rgba(255,255,255,.025); }
-.scope-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
-.scope-row:last-child { border-bottom: none; }
-.scope-badge { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--tone); }
-.scope-row span { font-size: 13px; color: #c8c8ce; line-height: 1.35; }
-
-/* ── SWIPE RUNTIME DIAGRAM (slide 5) ────────────────────────── */
-.runtime-diagram { display: grid; gap: 12px; margin-top: 36px; }
-.runtime-row { display: flex; gap: 12px; align-items: stretch; }
-.runtime-box {
-  flex: 1; padding: 18px 20px; border-radius: 18px;
-  border: 1px solid var(--line); background: rgba(255,255,255,.04);
-  position: relative; overflow: hidden;
-}
-.runtime-box-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); margin-bottom: 4px; }
-.runtime-box-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.runtime-box-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
-.runtime-arrow {
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,.3); font-size: 18px; flex-shrink: 0; padding: 0 4px;
-}
-.runtime-connector {
-  display: flex; align-items: center; justify-content: center;
-  gap: 8px; color: var(--muted); font-size: 12px;
-  padding: 8px 0;
-}
-.runtime-connector::before, .runtime-connector::after {
-  content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.1);
+@media (max-width: 1150px) {
+  .grid-2,
+  .grid-2.reverse,
+  .problem-layout,
+  .match-stage,
+  .cooking-layout,
+  .import-layout,
+  .trust-layout,
+  .maturity-layout { grid-template-columns: 1fr; }
+  .grid-2.reverse > :first-child { order: 2; }
+  .phone-stage,
+  .problem-visual,
+  .match-visual,
+  .cooking-visual { min-height: 560px; }
+  .editorial-flow { grid-template-columns: repeat(3,1fr); }
+  .flow-step:nth-child(3) { border-right: 0; }
+  .flow-step:nth-child(n+4) { border-top: 1px solid var(--slide-line); }
+  .flow-step:nth-child(4) { grid-column: 1 / 2; }
+  .scope-stage { grid-template-columns: 1fr; }
+  .scope-panel { min-height: 340px; }
+  .scope-panel h3 { margin-top: 38px; }
+  .friends-flow { grid-template-columns: 1fr; }
+  .friend-phase { min-height: 300px; }
+  .friend-phase h3 { margin-top: 38px; }
+  .trust-diagram { max-width: 850px; }
 }
 
-/* ── PIPELINE (slide 8) ──────────────────────────────────────── */
-.pipeline { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 44px; align-items: stretch; position: relative; }
-.pipeline-step {
-  padding: 28px 22px; border: 1px solid var(--line); position: relative; overflow: hidden;
-  background: rgba(255,255,255,.03);
-  transition: background .3s;
-}
-.pipeline-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-.pipeline-step:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
-.pipeline-step + .pipeline-step { border-left: none; }
-.pipeline-step:hover { background: rgba(255,255,255,.055); }
-.pipeline-step-label {
-  font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--tone); margin-bottom: 20px;
-}
-.pipeline-step-icon { font-size: 28px; margin-bottom: 14px; display: block; }
-.pipeline-step-title { font-size: 18px; font-weight: 740; margin-bottom: 8px; }
-.pipeline-step p { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
-.pipeline-step-arrow {
-  position: absolute; right: -13px; top: 50%; transform: translateY(-50%);
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--bg); border: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--muted); z-index: 3;
-}
-.pipeline-step:last-child .pipeline-step-arrow { display: none; }
-.pipeline-progress {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-  background: var(--tone); transform: scaleX(0); transform-origin: left;
-  transition: transform 1s cubic-bezier(.2,.8,.2,1);
-  opacity: .7;
-}
-.slide.is-visible .pipeline-progress { transform: scaleX(1); }
-.pipeline-step:nth-child(1) .pipeline-progress { transition-delay: .1s; }
-.pipeline-step:nth-child(2) .pipeline-progress { transition-delay: .25s; }
-.pipeline-step:nth-child(3) .pipeline-progress { transition-delay: .4s; }
-.pipeline-step:nth-child(4) .pipeline-progress { transition-delay: .55s; }
-
-/* ── ARCHITECTURE DIAGRAM (slide 9) ──────────────────────────── */
-.arch-diagram { margin-top: 36px; display: grid; gap: 10px; }
-.arch-layer { display: flex; gap: 10px; align-items: stretch; }
-.arch-block {
-  flex: 1; padding: 16px 18px; border-radius: 16px;
-  border: 1px solid var(--line); background: rgba(255,255,255,.04);
-  position: relative; overflow: hidden;
-}
-.arch-block-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); }
-.arch-block-name { font-size: 15px; font-weight: 700; margin-top: 4px; }
-.arch-block-detail { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
-.arch-divider {
-  display: flex; align-items: center; justify-content: center;
-  gap: 10px; font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .1em; text-transform: uppercase;
-}
-.arch-divider::before, .arch-divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
-
-/* ── FRIENDS VOTE DIAGRAM (slide 10) ────────────────────────── */
-.vote-flow { display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr; gap: 0; align-items: center; margin-top: 36px; }
-.vote-phase {
-  border-radius: var(--radius); border: 1px solid var(--line); padding: 22px;
-  background: rgba(255,255,255,.04); position: relative; overflow: hidden;
-}
-.vote-phase-num { font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--tone); }
-.vote-phase-title { font-size: 20px; font-weight: 760; margin: 8px 0 10px; letter-spacing: -.03em; }
-.vote-phase-detail { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
-.vote-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
-.vote-tag {
-  padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
-}
-.vote-arrow { display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.25); font-size: 20px; }
-
-/* ── FRIENDS LAYOUT ──────────────────────────────────────────── */
-.friends-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 28px; align-items: center; }
-.friends-layout .visuals { display: grid; grid-template-columns: .88fr 1.12fr; gap: 18px; align-items: end; }
-
-/* ── CODE-OF-LAW DIAGRAM (slide 10 tie-breaker) ──────────────── */
-.tiebreak-chip {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
-  border-radius: 999px; padding: 6px 14px; font-size: 13px; font-family: "SF Mono", monospace;
-  color: var(--green); margin-top: 14px;
-}
-
-/* ── CLOSE SLIDE LAYOUT ──────────────────────────────────────── */
-.close-layout { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
-.close-layout h2 { max-width: 900px; }
-.close-layout .lede { margin-left: auto; margin-right: auto; }
-.close-cta-row { display: flex; justify-content: center; margin-top: 28px; }
-
-/* ─────────────────────────────────────────────────────────────
-   RESPONSIVE
-   ──────────────────────────────────────────────────────────── */
-@media (max-width: 1100px) {
-  .grid-2, .friends-layout { grid-template-columns: minmax(0,1fr); }
-  .phone-stage { min-height: 500px; }
-  .grid-3, .scope-grid { grid-template-columns: 1fr 1fr; }
-  .dual-phones { grid-template-columns: repeat(2,minmax(0,1fr)); max-width: 520px; margin: 0 auto; }
-  .triple-phones { grid-template-columns: repeat(3,minmax(0,1fr)); max-width: 680px; margin: 0 auto; }
-  .flow-diagram { grid-template-columns: repeat(3,1fr); }
-  .flow-node:nth-child(3)::after { display: none; }
-  .pipeline { grid-template-columns: repeat(2,1fr); }
-  .pipeline-step:nth-child(1) { border-radius: var(--radius) 0 0 0; }
-  .pipeline-step:nth-child(2) { border-radius: 0 var(--radius) 0 0; border-left: 1px solid var(--line); }
-  .pipeline-step:nth-child(3) { border-radius: 0 0 0 var(--radius); border-top: none; }
-  .pipeline-step:nth-child(4) { border-radius: 0 0 var(--radius) 0; border-top: none; border-left: 1px solid var(--line); }
-  .vote-flow { grid-template-columns: 1fr; gap: 10px; }
-  .vote-arrow { transform: rotate(90deg); }
-}
-
-@media (max-width: 700px) {
-  .deck-nav { top: 12px; left: 12px; right: 12px; }
-  .brand small { display: none; }
-  .slide { padding: 88px 16px 58px; overflow: hidden; }
-  h1 { font-size: clamp(44px,15vw,76px); }
-  h2 { font-size: clamp(34px,11vw,60px); }
+@media (max-width: 760px) {
+  .deck-nav { top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; }
+  .brand-copy small { display: none; }
+  .brand { padding-right: 11px; }
+  .slide { padding: 88px 16px 58px; align-items: flex-start; }
+  h1 { font-size: clamp(52px, 17vw, 82px); }
+  h2 { font-size: clamp(42px, 13vw, 68px); }
   .lede { font-size: 16px; }
-  .phone-stage { min-height: 440px; margin-top: 16px; width: 100%; }
-  .phone { width: 40vw; border-radius: 22px; }
-  .phone.a { left: 0; top: 18%; }
-  .phone.b { left: 50%; top: 3%; transform: translateX(-50%) scale(1.05); }
-  .phone.c { right: 0; top: 22%; }
-  .phone-stage:hover .phone.b { transform: translateX(-50%) translateY(-5%) scale(1.08); }
-  .stat-strip { grid-template-columns: repeat(2,1fr); }
-  .grid-3, .scope-grid { grid-template-columns: 1fr; }
-  .mode-grid { grid-template-columns: 1fr; }
-  .flow-diagram { grid-template-columns: 1fr; }
-  .flow-node::after { display: none; }
-  .flow-node-accent { display: none; }
-  .pipeline { grid-template-columns: 1fr; }
-  .pipeline-step { border-radius: 0 !important; border-left: 1px solid var(--line) !important; border-top: none; }
-  .pipeline-step:first-child { border-radius: var(--radius) var(--radius) 0 0 !important; border-top: 1px solid var(--line) !important; }
-  .pipeline-step:last-child  { border-radius: 0 0 var(--radius) var(--radius) !important; }
-  .dual-phones { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; max-width: 100%; overflow: hidden; }
-  .triple-phones { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; max-width: 100%; overflow: hidden; }
-  .phone-static { border-radius: 18px; }
-  .friends-layout { grid-template-columns: 1fr; }
-  .friends-layout .visuals { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-  .tech-grid { grid-template-columns: 1fr; }
-  .bar-row { grid-template-columns: 80px 1fr 54px; gap: 8px; }
-  .metric-hero { font-size: clamp(50px,18vw,110px); }
-  .kicker-number { font-size: min(36vw,180px); }
-  .runtime-row { flex-direction: column; }
-  .runtime-arrow { transform: rotate(90deg); }
-  .arch-layer { flex-direction: column; }
-  .slide-counter { right: 14px; bottom: 12px; }
-  .vote-flow { grid-template-columns: 1fr; gap: 10px; }
+  .phone-stage { min-height: 460px; margin-top: 12px; }
+  .device { width: 43vw; border-radius: 28px; padding: 5px; }
+  .device::after { inset: 5px; border-radius: 23px; }
+  .device-screen { border-radius: 23px; }
+  .phone-stage .device:nth-child(1) { left: -4%; top: 21%; }
+  .phone-stage .device:nth-child(2) { left: 50%; top: 3%; }
+  .phone-stage .device:nth-child(3) { right: -4%; top: 23%; }
+  .problem-visual { min-height: 470px; }
+  .problem-visual .device:first-child { left: 2%; }
+  .problem-visual .device:last-child { right: 2%; }
+  .problem-item { grid-template-columns: 42px 1fr; }
+  .editorial-flow { grid-template-columns: 1fr; }
+  .flow-step { min-height: 220px; border-right: 0; border-top: 1px solid var(--slide-line); }
+  .flow-step:first-child { border-top: 0; }
+  .flow-step:nth-child(n+4) { border-top: 1px solid var(--slide-line); }
+  .flow-step:nth-child(4) { grid-column: auto; }
+  .mode-line { grid-template-columns: 1fr; }
+  .mode-item + .mode-item { padding-left: 0; border-left: 0; border-top: 1px solid var(--slide-line); }
+  .match-visual { min-height: 470px; }
+  .match-visual::before,
+  .match-visual::after { width: 48%; height: 58%; border-radius: 28px; }
+  .match-visual .ring { width: 330px; height: 330px; }
+  .match-visual .device { width: 42vw; }
+  .match-visual .device.left { left: 23%; }
+  .match-visual .device.right { right: 23%; }
+  .match-cards { grid-template-columns: 1fr; }
+  .plan-head { display: block; }
+  .plan-stage { min-height: 500px; }
+  .phone-row { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; align-items: center; }
+  .phone-row .device,
+  .close-phones .device { width: 100%; }
+  .cooking-visual { min-height: 510px; }
+  .cooking-visual::before { width: 360px; height: 360px; }
+  .cooking-visual .device { width: 46vw; left: 44%; }
+  .timer-orbit { width: 120px; right: 0; top: 13%; }
+  .timer-orbit strong { font-size: 22px; }
+  .cooking-point { grid-template-columns: 1fr; gap: 7px; }
+  .import-steps { grid-template-columns: 1fr; }
+  .import-step { min-height: 210px; }
+  .trust-layer { grid-template-columns: 1fr; }
+  .trust-label { min-height: 44px; }
+  .trust-bridge { margin-left: 0; }
+  .metric-grid { grid-template-columns: 1fr 1fr; }
+  .bar-row { grid-template-columns: 74px 1fr 52px; }
+  .close-phones { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+  .slide-counter { right: 12px; bottom: max(10px, env(safe-area-inset-bottom)); }
+  .footer-note { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .slide.is-visible .kicker-number { opacity: 1; }
 }
+
 @media print {
   .deck-nav, .progress, .slide-counter { display: none !important; }
-  .slide { page-break-after: always; min-height: 100vh; padding: 50px; overflow: visible; }
-  body { background: #050506 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { min-height: 100vh; page-break-after: always; padding: 56px; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
 <body>
 
-<div class="ambient-orbs" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;overflow:hidden">
+  <symbol id="i-chevron-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/><path d="m3 8 5-5M21 8l-5-5M3 16l5 5M21 16l-5 5"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5h5.5A2.5 2.5 0 0 1 12 7v13a3.5 3.5 0 0 0-3.5-3.5H4Z"/><path d="M20 4.5h-5.5A2.5 2.5 0 0 0 12 7v13a3.5 3.5 0 0 1 3.5-3.5H20Z"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="4" y="3" width="12" height="17" rx="3"/><path d="m9 8 2-2 2 2-2 2Z"/><path d="m16 6 2.5 1.1a3 3 0 0 1 1.5 4l-4.1 8.6"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 14h2M14 14h2M8 18h2"/></symbol>
+  <symbol id="i-pan" viewBox="0 0 24 24"><circle cx="9" cy="13" r="5"/><path d="m13 9 7-6M14 10l6-4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5A4.5 4.5 0 0 1 21 19"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></symbol>
+  <symbol id="i-device" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M10 5h4M11 19h2"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/><path d="M7 12h10"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 1.6 5.1L19 9l-5.4 1.9L12 16l-1.6-5.1L5 9l5.4-1.9Z"/><path d="m18 15 .9 2.6L22 19l-3.1 1.4L18 23l-.9-2.6L14 19l3.1-1.4Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.5 1-1a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h11a4 4 0 0 0 .6-8A6.5 6.5 0 0 0 6 8.5 4.8 4.8 0 0 0 7 18Z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-vote" viewBox="0 0 24 24"><path d="m4 11 4-4 4 4-4 4Z"/><path d="M12 8h8M12 16h8"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0Z"/><path d="M8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 13v5M8 21h8M9 18h6"/></symbol>
+</svg>
 
 <div class="progress" id="progress"></div>
 
-<nav class="deck-nav" aria-label="Deck navigation">
-  <a class="brand" href="#slide-1">
-    <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
-    <span class="brand-text"><span>envie</span><small>interactive pitch</small></span>
+<nav class="deck-nav" aria-label="Pitchdeck-Navigation">
+  <a class="brand" href="#slide-1" aria-label="Zur ersten Folie">
+    <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+    <span class="brand-copy"><strong>envie</strong><small>Interactive pitch</small></span>
   </a>
   <div class="deck-controls">
-    <button id="prev" aria-label="Vorherige Folie">↑</button>
-    <button id="next" aria-label="Nächste Folie">↓</button>
-    <button id="fs"   aria-label="Vollbild">⛶</button>
+    <button id="prev" aria-label="Vorherige Folie"><svg class="icon"><use href="#i-chevron-up"/></svg></button>
+    <button id="next" aria-label="Nächste Folie"><svg class="icon"><use href="#i-chevron-down"/></svg></button>
+    <button id="fs" aria-label="Vollbild"><svg class="icon"><use href="#i-expand"/></svg></button>
   </div>
 </nav>
 <div class="slide-counter"><span id="current">01</span> / 12</div>
 
-<!-- ── 01 INTRO ─────────────────────────────────────────────── -->
-<section class="slide" id="slide-1" data-title="Intro">
-  <div class="kicker-number">01</div>
+<section class="slide dark" id="slide-1" data-title="Intro">
+  <div class="slide-wash"></div>
+  <div class="card-sculpture" aria-hidden="true"><span></span><span></span></div>
   <div class="slide-inner grid-2">
-    <div>
+    <div class="hero-copy">
       <div class="eyebrow reveal">Pitchdeck · App Store Launch</div>
       <h1 class="reveal delay-1">Was essen wir <span class="gradient-text">heute?</span></h1>
-      <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen, konsequenten Produktfluss — lokal auf dem Gerät, oder live im Haushalt.</p>
-      <div class="pill-row reveal delay-3">
-        <span class="pill">Local-first</span>
-        <span class="pill">Cloud, wo Zusammenarbeit beginnt</span>
-        <span class="pill">On-device AI</span>
+      <p class="lede reveal delay-2">Envie verbindet Rezeptimport, gemeinsames Entscheiden, Wochenplanung, Einkauf und Kochen zu einem einzigen Produktfluss. Lokal, klar und genau dort vernetzt, wo Zusammenarbeit beginnt.</p>
+      <div class="hero-kicker reveal delay-3">
+        <span>Local-first</span>
+        <span>On-device AI</span>
+        <span>Gemeinsam statt nebeneinander</span>
       </div>
     </div>
-    <div class="phone-stage reveal delay-2">
-      <div class="phone a"><img src="assets/friends_home.webp" alt="Envie Friends Übersicht"></div>
-      <div class="phone b"><img src="assets/weekplan.webp" alt="Envie Wochenplan"></div>
-      <div class="phone c"><img src="assets/cooking.webp" alt="Envie Kochmodus"></div>
+    <div class="phone-stage reveal delay-2" aria-label="Envie App-Screens">
+      <div class="device"><div class="device-screen"><img src="assets/friends_home.webp" alt="Envie Friends Übersicht"></div></div>
+      <div class="device"><div class="device-screen"><img src="assets/weekplan.webp" alt="Envie Wochenplan"></div></div>
+      <div class="device"><div class="device-screen"><img src="assets/cooking.webp" alt="Envie Kochmodus"></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── 02 PROBLEM ────────────────────────────────────────────── -->
-<section class="slide" id="slide-2" data-title="Problem">
-  <div class="kicker-number">02</div>
-  <div class="slide-inner grid-2">
+<section class="slide light" id="slide-2" data-title="Problem">
+  <div class="slide-wash"></div>
+  <div class="slide-inner problem-layout">
     <div>
-      <div class="eyebrow reveal">Ausgangsproblem</div>
+      <div class="eyebrow reveal">Das Problem</div>
       <h2 class="reveal delay-1">Der letzte Meter beim Kochen ist kaputt.</h2>
-      <p class="lede reveal delay-2">Rezepte sind überall. Entscheidungen dauern. Planung passiert im Kopf. Einkauf und Kochen sind separate Werkzeuge — und keine Entscheidung ist wirklich gemeinsam.</p>
-      <div class="problem-stack reveal delay-3">
-        <div class="problem"><div class="problem-dot" style="background:var(--pink)"></div><p>Rezepte verschwinden in Chats, Browser-Tabs, Screenshots und PDFs — ohne Struktur, ohne Wiederfindbarkeit.</p></div>
-        <div class="problem"><div class="problem-dot" style="background:var(--blue)"></div><p>Ein Like ist noch keine gemeinsame Entscheidung. WhatsApp-Abstimmungen enden im Chaos.</p></div>
-        <div class="problem"><div class="problem-dot" style="background:var(--green)"></div><p>Nach der Entscheidung beginnt die eigentliche Arbeit erst: Einkaufsliste, Zutaten, Kochen — alles von vorne.</p></div>
+      <p class="lede reveal delay-2">Rezepte sind überall. Entscheidungen dauern. Planung passiert im Kopf. Und nach dem Entschluss beginnt die Arbeit erst.</p>
+      <div class="problem-list reveal delay-3">
+        <div class="problem-item"><span class="problem-num">01</span><p>Rezepte verschwinden in Chats, Browser-Tabs, Screenshots und PDFs.</p></div>
+        <div class="problem-item"><span class="problem-num">02</span><p>Ein Like ist noch keine gemeinsame Entscheidung.</p></div>
+        <div class="problem-item"><span class="problem-num">03</span><p>Einkauf, Planung und Kochen leben in getrennten Werkzeugen.</p></div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2">
-      <div class="phone-static"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
-      <div class="phone-static" style="transform:translateY(-40px)"><img src="assets/login.webp" alt="Anmeldung und Kollaboration"></div>
+    <div class="problem-visual reveal delay-2">
+      <div class="device"><div class="device-screen"><img src="assets/shopping.webp" alt="Envie Einkaufsliste"></div></div>
+      <div class="device"><div class="device-screen"><img src="assets/login.webp" alt="Envie Anmeldung und Zusammenarbeit"></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── 03 FLOW ───────────────────────────────────────────────── -->
-<section class="slide" id="slide-3" data-title="Flow">
-  <div class="kicker-number">03</div>
+<section class="slide dark" id="slide-3" data-title="Produktfluss">
+  <div class="slide-grid"></div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Produktfluss</div>
-    <h2 class="reveal delay-1">Nicht noch eine Rezept-App.<br>Ein geschlossener Kreislauf.</h2>
-    <p class="lede reveal delay-2">Fünf Stationen — eine durchgängige Nutzererfahrung ohne Medienbruch.</p>
-    <div class="flow-diagram reveal delay-3">
-      <div class="card flow-node" style="--tone:var(--pink)">
-        <div class="flow-node-accent"></div>
-        <div class="flow-node-num">01</div>
-        <div class="flow-node-icon">📷</div>
-        <div class="flow-node-title">Import</div>
-        <p class="flow-node-desc">Kamera, PDF, Web-Share oder Action-Extension — Vision OCR + Foundation Models.</p>
-      </div>
-      <div class="card flow-node" style="--tone:var(--blue)">
-        <div class="flow-node-accent"></div>
-        <div class="flow-node-num">02</div>
-        <div class="flow-node-icon">📚</div>
-        <div class="flow-node-title">Kochbuch</div>
-        <p class="flow-node-desc">Strukturierte Alben, Hero-Karussell, tägliche Entdeckungen — SwiftData on-device.</p>
-      </div>
-      <div class="card flow-node" style="--tone:var(--green)">
-        <div class="flow-node-accent"></div>
-        <div class="flow-node-num">03</div>
-        <div class="flow-node-icon">♠</div>
-        <div class="flow-node-title">Entscheiden</div>
-        <p class="flow-node-desc">Quick · Woche · Endlos · Friends — drei soziale Scopes, ein Swipe-Erlebnis.</p>
-      </div>
-      <div class="card flow-node" style="--tone:var(--amber)">
-        <div class="flow-node-accent"></div>
-        <div class="flow-node-num">04</div>
-        <div class="flow-node-icon">📅</div>
-        <div class="flow-node-title">Planen</div>
-        <p class="flow-node-desc">Matches landen direkt im Wochenplan. Einkaufsliste dedupliziert und kategorisiert.</p>
-      </div>
-      <div class="card flow-node" style="--tone:var(--pink-soft)">
-        <div class="flow-node-accent"></div>
-        <div class="flow-node-num">05</div>
-        <div class="flow-node-icon">🍳</div>
-        <div class="flow-node-title">Kochen</div>
-        <p class="flow-node-desc">Step-by-Step Begleitung, Timer, Live Activity in Dynamic Island und Sperrbildschirm.</p>
-      </div>
+    <h2 class="reveal delay-1">Nicht noch eine Rezept-App.<br><span class="gradient-text">Ein geschlossener Kreislauf.</span></h2>
+    <p class="lede reveal delay-2">Fünf Stationen. Eine durchgängige Erfahrung. Kein Medienbruch zwischen Idee, Entscheidung und erstem Bissen.</p>
+
+    <div class="editorial-flow reveal delay-3">
+      <article class="flow-step" style="--tone:var(--pink)">
+        <div class="flow-index">01</div>
+        <div class="flow-icon"><svg class="icon"><use href="#i-camera"/></svg></div>
+        <h3>Import</h3>
+        <p>Kamera, PDF, Web-Share oder Action Extension. Envie liest die Quelle, nicht der Nutzer.</p>
+      </article>
+      <article class="flow-step" style="--tone:var(--blue)">
+        <div class="flow-index">02</div>
+        <div class="flow-icon"><svg class="icon"><use href="#i-book"/></svg></div>
+        <h3>Kochbuch</h3>
+        <p>Rezepte werden strukturiert, auffindbar und in persönliche Kochbücher übersetzt.</p>
+      </article>
+      <article class="flow-step" style="--tone:#7bd8b0">
+        <div class="flow-index">03</div>
+        <div class="flow-icon"><svg class="icon"><use href="#i-cards"/></svg></div>
+        <h3>Entscheiden</h3>
+        <p>Quick, Woche, Endlos und Friends machen aus Vorschlägen echte Freigaben.</p>
+      </article>
+      <article class="flow-step" style="--tone:#f2b85b">
+        <div class="flow-index">04</div>
+        <div class="flow-icon"><svg class="icon"><use href="#i-calendar"/></svg></div>
+        <h3>Planen</h3>
+        <p>Matches landen direkt im Wochenplan. Zutaten werden zur Einkaufsliste.</p>
+      </article>
+      <article class="flow-step" style="--tone:var(--pink-soft)">
+        <div class="flow-index">05</div>
+        <div class="flow-icon"><svg class="icon"><use href="#i-pan"/></svg></div>
+        <h3>Kochen</h3>
+        <p>Schrittfolge, Timer und Live Activity begleiten den letzten Meter ruhig zu Ende.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- ── 04 SCOPES ─────────────────────────────────────────────── -->
-<section class="slide" id="slide-4" data-title="Scopes">
-  <div class="kicker-number">04</div>
+<section class="slide light" id="slide-4" data-title="Scopes">
+  <div class="slide-wash"></div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Entscheidungszentrale</div>
-    <h2 class="reveal delay-1">Drei soziale Scopes.<br>Drei klare Abstimmungsmodi.</h2>
+    <h2 class="reveal delay-1">Drei soziale Räume.<br>Drei klare Rollen.</h2>
+    <p class="lede reveal delay-2">Envie trennt lokale Nutzung, dauerhafte Haushalte und temporäre Freundesrunden. Dadurch bleibt jeder Modus verständlich.</p>
 
-    <div class="scope-grid reveal delay-2">
-      <!-- Local -->
-      <div class="scope-block" style="--tone:var(--blue); --tone-rgb:35,184,245">
-        <div class="scope-header">
-          <div class="scope-header-bg"></div>
-          <div class="scope-header-label">01 · Device</div>
-          <div class="scope-header-name">Lokal</div>
-        </div>
-        <div class="scope-body">
-          <div class="scope-row"><div class="scope-badge"></div><span>Geräteinterne Personenprofile</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>SwiftData · kein Account nötig</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Gemeinsamer Plan auf dem Gerät</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Likes bleiben personengebunden</span></div>
-        </div>
-      </div>
-      <!-- Family -->
-      <div class="scope-block" style="--tone:var(--pink); --tone-rgb:255,77,141">
-        <div class="scope-header">
-          <div class="scope-header-bg"></div>
-          <div class="scope-header-label">02 · Household</div>
-          <div class="scope-header-name">Familie</div>
-        </div>
-        <div class="scope-body">
-          <div class="scope-row"><div class="scope-badge"></div><span>Dauerhafter Haushalt via Firestore</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Echtzeit-Reaktionen · optimistisch</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Match = 2 × Like → Cloud-Plan</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Einkaufsliste live synchronisiert</span></div>
-        </div>
-      </div>
-      <!-- Friends -->
-      <div class="scope-block" style="--tone:var(--green); --tone-rgb:131,216,173">
-        <div class="scope-header">
-          <div class="scope-header-bg"></div>
-          <div class="scope-header-label">03 · Event</div>
-          <div class="scope-header-name">Freunde</div>
-        </div>
-        <div class="scope-body">
-          <div class="scope-row"><div class="scope-badge"></div><span>Temporäre Gruppenrunde</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Invite per Deep-Link Token</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Zweiphasiger Abstimmungsablauf</span></div>
-          <div class="scope-row"><div class="scope-badge"></div><span>Deterministischer Tie-Breaker</span></div>
-        </div>
-      </div>
+    <div class="scope-stage reveal delay-3">
+      <article class="scope-panel" style="--tone:var(--blue)">
+        <header><span class="scope-number">01 · Device</span><span class="scope-symbol"><svg class="icon"><use href="#i-device"/></svg></span></header>
+        <h3>Lokal</h3>
+        <p>Mehrere Personen auf einem Gerät. Kein Account. Gemeinsamer Plan, getrennte Vorlieben.</p>
+        <div class="scope-meta"><span>SwiftData</span><span>Offline</span><span>Privat</span></div>
+      </article>
+      <article class="scope-panel" style="--tone:var(--pink)">
+        <header><span class="scope-number">02 · Household</span><span class="scope-symbol"><svg class="icon"><use href="#i-home"/></svg></span></header>
+        <h3>Familie</h3>
+        <p>Dauerhafter Haushalt mit Live-Reaktionen, gemeinsamem Wochenplan und synchronisierter Einkaufsliste.</p>
+        <div class="scope-meta"><span>Realtime</span><span>Cloud-Plan</span><span>Gemeinsam</span></div>
+      </article>
+      <article class="scope-panel" style="--tone:#69cfa2">
+        <header><span class="scope-number">03 · Event</span><span class="scope-symbol"><svg class="icon"><use href="#i-users"/></svg></span></header>
+        <h3>Freunde</h3>
+        <p>Temporäre Gruppenrunde mit Einladung, Nominierung, Veto und eindeutiger Finalentscheidung.</p>
+        <div class="scope-meta"><span>Invite</span><span>Vote</span><span>Finale</span></div>
+      </article>
     </div>
 
-    <div class="mode-grid reveal delay-3">
-      <div class="card mode-card" style="--tone:var(--blue)">
-        <strong>7</strong><span>Jetzt schnell</span>
-        <p class="card p">Erster Match belegt sofort den Tag — Session endet.</p>
-      </div>
-      <div class="card mode-card" style="--tone:var(--pink)">
-        <strong>20</strong><span>Woche planen</span>
-        <p class="card p">Matches füllen freie Wochentage bis die Zieltage belegt sind.</p>
-      </div>
-      <div class="card mode-card" style="--tone:var(--green)">
-        <strong>∞</strong><span>Endlos</span>
-        <p class="card p">Geschmack sammeln — kein automatischer Planwrite.</p>
-      </div>
+    <div class="mode-line reveal delay-4">
+      <div class="mode-item" style="--tone:var(--blue)"><strong>7</strong><span>Jetzt schnell</span></div>
+      <div class="mode-item" style="--tone:var(--pink)"><strong>20</strong><span>Woche planen</span></div>
+      <div class="mode-item" style="--tone:#69cfa2"><strong>∞</strong><span>Endlos entdecken</span></div>
     </div>
   </div>
 </section>
 
-<!-- ── 05 DECISION ENGINE ─────────────────────────────────────── -->
-<section class="slide" id="slide-5" data-title="Decision Engine">
-  <div class="kicker-number">05</div>
-  <div class="slide-inner grid-2">
+<section class="slide dark" id="slide-5" data-title="Match">
+  <div class="slide-wash"></div>
+  <div class="slide-inner match-stage">
     <div>
-      <div class="eyebrow reveal">Matchlogik & Runtime</div>
+      <div class="eyebrow reveal">Matchlogik</div>
       <h2 class="reveal delay-1">Ein Like ist noch kein Abendessen.</h2>
-      <p class="lede reveal delay-2">Envie trennt Zustimmung von Planwirkung. Erst ein kontextuell gültiger gemeinsamer Treffer wird transaktionssicher in den Wochenplan geschrieben.</p>
-
-      <div class="runtime-diagram reveal delay-3">
-        <div class="runtime-row">
-          <div class="runtime-box" style="--tone:var(--pink)">
-            <div class="runtime-box-label">UI-Shell</div>
-            <div class="runtime-box-name">SwipeView</div>
-            <div class="runtime-box-desc">Gesten · Haptik · Card Stack</div>
-          </div>
-          <div class="runtime-arrow">→</div>
-          <div class="runtime-box" style="--tone:var(--blue)">
-            <div class="runtime-box-label">Coordinator</div>
-            <div class="runtime-box-name">SwipeViewModel</div>
-            <div class="runtime-box-desc">Stack · Session · Reaktionen</div>
-          </div>
-        </div>
-        <div class="runtime-connector">SwipeResult-Pipeline</div>
-        <div class="runtime-row">
-          <div class="runtime-box" style="--tone:var(--green)">
-            <div class="runtime-box-label">Local</div>
-            <div class="runtime-box-name">SwiftData Writer</div>
-            <div class="runtime-box-desc">Solo-Like · Match lokal</div>
-          </div>
-          <div class="runtime-arrow">→</div>
-          <div class="runtime-box" style="--tone:var(--amber)">
-            <div class="runtime-box-label">Cloud</div>
-            <div class="runtime-box-name">FamilyMatchCoordinator</div>
-            <div class="runtime-box-desc">Transaktionaler Claim · idempotent</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="feature-list reveal delay-4">
-        <div class="feature-row" style="--tone:var(--pink)">
-          <div class="icon">♥</div>
-          <div><h3>Solo-Like</h3><p>Personengebundene Freigabe — kein Plan-Eintrag.</p></div>
-        </div>
-        <div class="feature-row" style="--tone:var(--green)">
-          <div class="icon">×2</div>
-          <div><h3>Match</h3><p>Quick / Woche / Family / Friends — jeder Kontext hat eigene Planlogik.</p></div>
-        </div>
+      <p class="lede reveal delay-2">Envie trennt Zustimmung von Planwirkung. Erst ein gültiger gemeinsamer Treffer verändert den Wochenplan.</p>
+      <div class="match-rule reveal delay-3">Zustimmung wird Entscheidung</div>
+      <div class="match-cards reveal delay-4">
+        <div class="match-card"><strong>Solo-Like</strong><span>Eine persönliche Freigabe. Noch kein Planeintrag.</span></div>
+        <div class="match-card"><strong>Match</strong><span>Zwei passende Zustimmungen. Kontextgerecht und idempotent geschrieben.</span></div>
       </div>
     </div>
-    <div class="dual-phones reveal delay-2">
-      <div class="phone-static"><img src="assets/swipe.webp" alt="Woche planen Swipe"></div>
-      <div class="phone-static" style="transform:translateY(-34px)"><img src="assets/match.webp" alt="Envie Matchmoment"></div>
+    <div class="match-visual reveal delay-2">
+      <div class="ring"></div>
+      <div class="device left"><div class="device-screen"><img src="assets/swipe.webp" alt="Envie Swipe"></div></div>
+      <div class="device right"><div class="device-screen"><img src="assets/match.webp" alt="Envie Match"></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── 06 PLAN ───────────────────────────────────────────────── -->
-<section class="slide" id="slide-6" data-title="Plan">
-  <div class="kicker-number">06</div>
+<section class="slide light" id="slide-6" data-title="Plan">
+  <div class="slide-wash"></div>
   <div class="slide-inner">
-    <div class="eyebrow reveal">Planungsmaschine</div>
-    <h2 class="reveal delay-1">Aus Entscheidungen wird Einkauf.</h2>
-    <p class="lede reveal delay-2">Woche, Monat und Einkaufsliste sind keine Zusatzmodule — sondern die direkte Fortsetzung der Entscheidung. Zutaten werden dedupliziert, Supermarktkategorien zugeordnet, Family-Haken in Echtzeit synchronisiert.</p>
-    <div class="triple-phones reveal delay-3" style="margin-top:36px">
-      <div class="phone-static"><img src="assets/weekplan.webp" alt="Wochenplan"></div>
-      <div class="phone-static" style="transform:translateY(-30px)"><img src="assets/shopping.webp" alt="Einkaufsliste"></div>
-      <div class="phone-static"><img src="assets/month.webp" alt="Monatsplan"></div>
+    <div class="plan-head">
+      <div>
+        <div class="eyebrow reveal">Planungsmaschine</div>
+        <h2 class="reveal delay-1">Aus Entscheidungen wird Einkauf.</h2>
+      </div>
+      <p class="lede reveal delay-2">Woche, Monat und Einkaufsliste sind keine Zusatzmodule. Sie sind die direkte Fortsetzung der Entscheidung.</p>
     </div>
+    <div class="plan-stage reveal delay-3">
+      <div class="phone-row">
+        <div class="device"><div class="device-screen"><img src="assets/weekplan.webp" alt="Envie Wochenplan"></div></div>
+        <div class="device"><div class="device-screen"><img src="assets/shopping.webp" alt="Envie Einkaufsliste"></div></div>
+        <div class="device"><div class="device-screen"><img src="assets/month.webp" alt="Envie Monatsplan"></div></div>
+      </div>
+    </div>
+    <div class="plan-caption reveal delay-4"><span>Plan</span><span>Liste</span><span>Überblick</span></div>
   </div>
 </section>
 
-<!-- ── 07 COOKING ────────────────────────────────────────────── -->
-<section class="slide" id="slide-7" data-title="Cooking">
-  <div class="kicker-number">07</div>
-  <div class="slide-inner grid-2">
+<section class="slide dark" id="slide-7" data-title="Kochen">
+  <div class="slide-grid"></div>
+  <div class="slide-inner cooking-layout">
+    <div class="cooking-visual reveal delay-2">
+      <div class="device"><div class="device-screen"><img src="assets/cooking.webp" alt="Envie Kochmodus"></div></div>
+      <div class="timer-orbit" aria-label="Timer"><strong>12:48</strong></div>
+    </div>
     <div>
       <div class="eyebrow reveal">Kochmodus</div>
-      <h2 class="reveal delay-1">Am Herd zählt Ruhe,<br>nicht Feature-Lärm.</h2>
-      <p class="lede reveal delay-2">Großformatige Schritt-für-Schritt-Karten, persistierter Kochstand und Live Activity im Dynamic Island — der Kochmodus verschwindet im Hintergrund, nicht im Weg.</p>
-      <div class="tech-grid reveal delay-3">
-        <div class="card tech"><b>Step-by-step</b><span>Fokus-UI mit Zutatenzoom per Schritt</span></div>
-        <div class="card tech"><b>Persistenz</b><span>CookingManager speichert aktiven Schritt</span></div>
-        <div class="card tech"><b>Timer</b><span>Endzeit statt fragilem Countdown</span></div>
-        <div class="card tech"><b>Dynamic Island</b><span>LiveActivityManager · Sperrbildschirm</span></div>
-      </div>
-    </div>
-    <div class="dual-phones reveal delay-2" style="grid-template-columns:minmax(0,390px)">
-      <div class="phone-static"><img src="assets/cooking.webp" alt="Envie Kochmodus mit Timer"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 08 AI IMPORT ──────────────────────────────────────────── -->
-<section class="slide" id="slide-8" data-title="AI Import">
-  <div class="kicker-number">08</div>
-  <div class="slide-inner">
-    <div class="eyebrow reveal">Import als Wettbewerbsvorteil</div>
-    <h2 class="reveal delay-1">Jede Quelle.<br>Ein strukturiertes Rezept.</h2>
-    <p class="lede reveal delay-2">Vision-OCR liest, Apple Foundation Models ordnen, die Review-Ansicht hält den Nutzer in Kontrolle — vollständig on-device, keine Cloud-API, keine Kosten pro Import.</p>
-
-    <div class="pipeline reveal delay-3">
-      <div class="pipeline-step" style="--tone:var(--pink)">
-        <div class="pipeline-progress"></div>
-        <div class="pipeline-step-label">Input</div>
-        <span class="pipeline-step-icon">📷</span>
-        <div class="pipeline-step-title">Kamera · PDF · Web</div>
-        <p>Share- und Action-Extension. Jede Quelle, die iOS kennt.</p>
-        <div class="pipeline-step-arrow">›</div>
-      </div>
-      <div class="pipeline-step" style="--tone:var(--blue)">
-        <div class="pipeline-progress"></div>
-        <div class="pipeline-step-label">Read</div>
-        <span class="pipeline-step-icon">🔍</span>
-        <div class="pipeline-step-title">Apple Vision OCR</div>
-        <p>Texterkennung direkt auf dem Gerät. JSON-LD-Parser für Web-Shares.</p>
-        <div class="pipeline-step-arrow">›</div>
-      </div>
-      <div class="pipeline-step" style="--tone:var(--green)">
-        <div class="pipeline-progress"></div>
-        <div class="pipeline-step-label">Structure</div>
-        <span class="pipeline-step-icon">🧠</span>
-        <div class="pipeline-step-title">Foundation Models</div>
-        <p>On-device Apple Intelligence: Zutaten, Schritte, Metadaten. Regex-Fallback.</p>
-        <div class="pipeline-step-arrow">›</div>
-      </div>
-      <div class="pipeline-step" style="--tone:var(--amber)">
-        <div class="pipeline-progress"></div>
-        <div class="pipeline-step-label">Control</div>
-        <span class="pipeline-step-icon">✅</span>
-        <div class="pipeline-step-title">Review &amp; Save</div>
-        <p>ImportReviewView: prüfen, korrigieren, lokal in SwiftData sichern.</p>
+      <h2 class="reveal delay-1">Am Herd zählt Ruhe.<br>Nicht Feature-Lärm.</h2>
+      <p class="lede reveal delay-2">Große Schritte, persistierter Kochstand und Live Activity. Envie bleibt präsent, ohne im Weg zu stehen.</p>
+      <div class="cooking-points reveal delay-3">
+        <div class="cooking-point"><strong>Fokus</strong><span>Eine Aufgabe pro Schritt, mit Zutatenbezug statt Bildschirmrauschen.</span></div>
+        <div class="cooking-point"><strong>Persistenz</strong><span>Der aktive Schritt bleibt erhalten, selbst wenn die App geschlossen wird.</span></div>
+        <div class="cooking-point"><strong>Live Activity</strong><span>Timer und Kochfortschritt wandern in Dynamic Island und Sperrbildschirm.</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── 09 ARCHITECTURE ───────────────────────────────────────── -->
-<section class="slide" id="slide-9" data-title="Architecture">
-  <div class="kicker-number">09</div>
-  <div class="slide-inner grid-2">
+<section class="slide light" id="slide-8" data-title="AI Import">
+  <div class="slide-wash"></div>
+  <div class="slide-inner import-layout">
     <div>
-      <div class="eyebrow reveal">Architektur</div>
-      <h2 class="reveal delay-1">Local-first.<br>Cloud, wo Zusammenarbeit entsteht.</h2>
-      <p class="lede reveal delay-2">Kein Account für die Basisnutzung. Firebase greift erst bei Haushalt oder Freundesrunden — mit getrennten Daten- und Reaktionspfaden.</p>
-
-      <div class="arch-diagram reveal delay-3">
-        <div class="arch-layer">
-          <div class="arch-block" style="--tone:var(--pink)">
-            <div class="arch-block-label">On-device</div>
-            <div class="arch-block-name">SwiftData</div>
-            <div class="arch-block-detail">Dish · WeekPlan · DecisionSession · Person</div>
-          </div>
-          <div class="arch-block" style="--tone:var(--pink-soft)">
-            <div class="arch-block-label">AI</div>
-            <div class="arch-block-name">Apple Foundation Models</div>
-            <div class="arch-block-detail">RecipeAIService · Vision OCR</div>
-          </div>
-        </div>
-        <div class="arch-divider">Cloud-Schicht — nur bei Kollaboration</div>
-        <div class="arch-layer">
-          <div class="arch-block" style="--tone:var(--blue)">
-            <div class="arch-block-label">Auth</div>
-            <div class="arch-block-name">Firebase Auth</div>
-            <div class="arch-block-detail">Anonym · Google · Apple (vorbereitet)</div>
-          </div>
-          <div class="arch-block" style="--tone:var(--green)">
-            <div class="arch-block-label">Sync</div>
-            <div class="arch-block-name">Firestore</div>
-            <div class="arch-block-detail">Household · reactionStates/{uid} · FriendRound · Claims</div>
-          </div>
-          <div class="arch-block" style="--tone:var(--amber)">
-            <div class="arch-block-label">Security</div>
-            <div class="arch-block-name">App Check</div>
-            <div class="arch-block-detail">App Attest · DeviceCheck · Pre-Release Enforcement</div>
-          </div>
-        </div>
-      </div>
+      <div class="eyebrow reveal">Import als Vorteil</div>
+      <h2 class="reveal delay-1">Mach ein Foto.<br><span class="gradient-text">Envie macht den Rest.</span></h2>
+      <p class="lede reveal delay-2">Vision erkennt den Text. Apple Foundation Models strukturieren Zutaten, Schritte und Metadaten. Die Review-Ansicht hält den Nutzer in Kontrolle.</p>
+      <div class="import-note reveal delay-3">On-device. Keine Cloud-API. Keine Kosten pro Import.</div>
     </div>
-    <div class="dual-phones reveal delay-2">
-      <div class="phone-static"><img src="assets/household.webp" alt="Haushalt verwalten"></div>
-      <div class="phone-static" style="transform:translateY(-34px)"><img src="assets/login.webp" alt="Anmeldung"></div>
+    <div class="import-steps reveal delay-2">
+      <article class="import-step" style="--tone:var(--pink)">
+        <div class="import-step-top"><span>01 · Input</span><svg class="icon"><use href="#i-camera"/></svg></div>
+        <h3>Kamera, PDF, Web</h3>
+        <p>Share Extension und Action Extension holen Rezepte aus nahezu jeder Quelle.</p>
+      </article>
+      <article class="import-step" style="--tone:var(--blue)">
+        <div class="import-step-top"><span>02 · Read</span><svg class="icon"><use href="#i-scan"/></svg></div>
+        <h3>Apple Vision OCR</h3>
+        <p>Texterkennung direkt auf dem Gerät. Web-Shares nutzen strukturierte Daten, wenn sie vorhanden sind.</p>
+      </article>
+      <article class="import-step" style="--tone:#69cfa2">
+        <div class="import-step-top"><span>03 · Structure</span><svg class="icon"><use href="#i-spark"/></svg></div>
+        <h3>Foundation Models</h3>
+        <p>Zutaten, Schritte, Zeiten und Metadaten werden in ein echtes Rezeptmodell überführt.</p>
+      </article>
+      <article class="import-step" style="--tone:#f2b85b">
+        <div class="import-step-top"><span>04 · Control</span><svg class="icon"><use href="#i-check"/></svg></div>
+        <h3>Review &amp; Save</h3>
+        <p>Prüfen, korrigieren und lokal speichern. Die KI bereitet vor, der Nutzer entscheidet.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- ── 10 FRIENDS ────────────────────────────────────────────── -->
-<section class="slide" id="slide-10" data-title="Friends">
-  <div class="kicker-number">10</div>
+<section class="slide dark" id="slide-9" data-title="Architektur">
+  <div class="slide-wash"></div>
+  <div class="slide-inner trust-layout">
+    <div>
+      <div class="eyebrow reveal">Vertrauen durch Architektur</div>
+      <h2 class="reveal delay-1">Deine Rezepte gehören dir.</h2>
+      <p class="lede reveal delay-2">Kein Account für die Basisnutzung. Die Cloud beginnt erst dort, wo Zusammenarbeit beginnt. Lokale und kollaborative Datenpfade bleiben sauber getrennt.</p>
+    </div>
+    <div class="trust-diagram reveal delay-2">
+      <div class="trust-layer" style="--tone:var(--pink)">
+        <div class="trust-label">On-device</div>
+        <div class="trust-content"><strong>SwiftData + Apple Intelligence</strong><span>Rezepte, Personen, Wochenpläne und KI-Import bleiben lokal nutzbar.</span></div>
+      </div>
+      <div class="trust-bridge">Cloud nur bei Kollaboration</div>
+      <div class="trust-layer" style="--tone:var(--blue)">
+        <div class="trust-label">Identity</div>
+        <div class="trust-content"><strong>Firebase Auth</strong><span>Anonyme Nutzung, Google Sign-In und vorbereitete Apple-Anmeldung.</span></div>
+      </div>
+      <div class="trust-layer" style="--tone:#69cfa2">
+        <div class="trust-label">Realtime</div>
+        <div class="trust-content"><strong>Cloud Firestore</strong><span>Haushalte, Reaktionen, Friends-Runden und gemeinsame Listen in Echtzeit.</span></div>
+      </div>
+      <div class="trust-layer" style="--tone:#f2b85b">
+        <div class="trust-label">Security</div>
+        <div class="trust-content"><strong>App Check</strong><span>App Attest und DeviceCheck schützen die produktiven Cloud-Zugriffe.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide light" id="slide-10" data-title="Friends">
+  <div class="slide-wash"></div>
   <div class="slide-inner">
     <div class="eyebrow reveal">Friends Mode</div>
-    <h2 class="reveal delay-1">Keine Chat-Abstimmung.<br>Eine gehostete Entscheidung.</h2>
+    <h2 class="reveal delay-1">Keine Chat-Abstimmung.<br><span class="gradient-text">Eine gehostete Entscheidung.</span></h2>
+    <p class="lede reveal delay-2">Envie reduziert Gruppendynamik auf drei verständliche Phasen: nominieren, final abstimmen, entscheiden.</p>
 
-    <div class="vote-flow reveal delay-2">
-      <div class="vote-phase" style="--tone:var(--pink)">
-        <div class="vote-phase-num">Phase 1 · Nominierung &amp; Veto</div>
-        <div class="vote-phase-title">2×3 Grid-Abstimmung</div>
-        <p class="vote-phase-detail">Jeder Teilnehmer bewertet Stacks im Grid. Like = nominiert. Veto = für alle gesperrt. Ballots werden gebündelt an Firestore übertragen.</p>
-        <div class="vote-actions">
-          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
-          <span class="vote-tag" style="color:var(--pink)">✗ Veto</span>
-          <span class="vote-tag" style="color:var(--muted)">→ Weitergabe</span>
-        </div>
-      </div>
-      <div class="vote-arrow">→</div>
-      <div class="vote-phase" style="--tone:var(--blue)">
-        <div class="vote-phase-num">Phase 2 · Finalrunde</div>
-        <div class="vote-phase-title">Klassischer Swipe</div>
-        <p class="vote-phase-detail">Verbliebene Finalisten aus Phase 1 im gewohnten Swipe-Format. Like oder Pass — schnell und eindeutig.</p>
-        <div class="vote-actions">
-          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
-          <span class="vote-tag" style="color:var(--muted)">✗ Pass</span>
-        </div>
-      </div>
-      <div class="vote-arrow">→</div>
-      <div class="vote-phase" style="--tone:var(--green)">
-        <div class="vote-phase-num">Ergebnis</div>
-        <div class="vote-phase-title">Deterministisch</div>
-        <p class="vote-phase-detail">Stimmengewinner steht sofort fest. Bei Gleichstand entscheidet ein stabiler Seed-Algorithmus — kein Live-Lärm, keine endlose Diskussion.</p>
-        <div class="tiebreak-chip">roundSeed + candidateId → Tie-Breaker</div>
-      </div>
+    <div class="friends-flow reveal delay-3">
+      <article class="friend-phase" style="--tone:var(--pink)">
+        <div class="friend-phase-num">01 · Nominierung</div>
+        <h3>Grid statt Endlos-Chat</h3>
+        <p>Jeder bewertet kompakte Kandidatenstapel. Zustimmung nominiert, ein Veto sperrt.</p>
+        <div class="friend-tags"><span>2 × 3 Grid</span><span>Nominierung</span><span>Veto</span></div>
+      </article>
+      <article class="friend-phase" style="--tone:var(--blue)">
+        <div class="friend-phase-num">02 · Finalrunde</div>
+        <h3>Nur noch echte Kandidaten</h3>
+        <p>Die verbleibenden Gerichte gehen in eine schnelle, bekannte Swipe-Entscheidung.</p>
+        <div class="friend-tags"><span>Finalisten</span><span>Like</span><span>Pass</span></div>
+      </article>
+      <article class="friend-phase" style="--tone:#69cfa2">
+        <div class="friend-phase-num">03 · Ergebnis</div>
+        <h3>Eindeutig, sofort, fair</h3>
+        <p>Der Stimmengewinner steht fest. Gleichstände werden deterministisch aufgelöst.</p>
+        <div class="friend-tags"><span>Winner</span><span>Stable Seed</span><span>Kein Nachverhandeln</span></div>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- ── 11 MATURITY ───────────────────────────────────────────── -->
-<section class="slide" id="slide-11" data-title="Maturity">
-  <div class="kicker-number">11</div>
-  <div class="slide-inner grid-2">
+<section class="slide dark" id="slide-11" data-title="Produktreife">
+  <div class="slide-grid"></div>
+  <div class="slide-inner maturity-layout">
     <div>
       <div class="eyebrow reveal">Produktreife</div>
-      <div class="metric-hero reveal delay-1">44.679</div>
-      <div class="metric-caption reveal delay-2">Produktions-LOC · plus 2.524 Test-LOC in 6 Testdateien</div>
-      <div class="stat-strip reveal delay-3">
-        <div class="stat"><strong>210</strong><span>Swift-Dateien</span></div>
-        <div class="stat"><strong>3</strong><span>soziale Scopes</span></div>
-        <div class="stat"><strong>4</strong><span>adaptive Tabs</span></div>
-        <div class="stat"><strong>~213</strong><span>Ø LOC / Datei</span></div>
+      <div class="big-metric reveal delay-1">44.679</div>
+      <div class="metric-label reveal delay-2">Produktions-LOC · plus 2.524 Test-LOC in 6 Testdateien</div>
+      <div class="metric-grid reveal delay-3">
+        <div class="metric-tile"><strong>210</strong><span>Swift-Dateien</span></div>
+        <div class="metric-tile"><strong>3</strong><span>soziale Scopes</span></div>
+        <div class="metric-tile"><strong>4</strong><span>adaptive Tabs</span></div>
+        <div class="metric-tile"><strong>213</strong><span>durchschnittliche LOC pro Datei</span></div>
       </div>
     </div>
-    <div class="card reveal delay-2" style="padding:32px">
-      <h3 style="font-size:30px;margin-bottom:6px">Kein Mockup.<br>Ein gewachsener Pre-Release-Build.</h3>
-      <p style="margin-bottom:0;color:var(--muted)">Weitgehend in spezialisierte Dateien zerlegt. Komplexitätsschwerpunkte bleiben bewusst sichtbar.</p>
-      <div class="bar-chart">
-        <div class="bar-row"><span>Views</span>      <div class="bar"><i style="--w:93%"></i></div><b>20.800</b></div>
-        <div class="bar-row"><span>ViewModels</span> <div class="bar"><i style="--w:46%"></i></div><b>10.186</b></div>
-        <div class="bar-row"><span>Services</span>   <div class="bar"><i style="--w:44%"></i></div><b>9.671</b></div>
-        <div class="bar-row"><span>Models</span>     <div class="bar"><i style="--w:13%"></i></div><b>2.881</b></div>
-        <div class="bar-row"><span>Utilities</span>  <div class="bar"><i style="--w:6%"></i></div> <b>1.141</b></div>
+    <div class="maturity-card reveal delay-2">
+      <h3>Kein Mockup.<br>Ein gewachsener Pre-Release-Build.</h3>
+      <p>Die App ist in spezialisierte Komponenten, ViewModels und Services zerlegt. Die Komplexität ist nicht versteckt, sondern organisiert.</p>
+      <div class="bar-list">
+        <div class="bar-row"><span>Views</span><div class="bar-track"><i style="--w:93%"></i></div><b>20.800</b></div>
+        <div class="bar-row"><span>ViewModels</span><div class="bar-track"><i style="--w:46%"></i></div><b>10.186</b></div>
+        <div class="bar-row"><span>Services</span><div class="bar-track"><i style="--w:44%"></i></div><b>9.671</b></div>
+        <div class="bar-row"><span>Models</span><div class="bar-track"><i style="--w:13%"></i></div><b>2.881</b></div>
+        <div class="bar-row"><span>Utilities</span><div class="bar-track"><i style="--w:6%"></i></div><b>1.141</b></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── 12 CLOSE ──────────────────────────────────────────────── -->
-<section class="slide" id="slide-12" data-title="Close">
-  <div class="kicker-number">12</div>
+<section class="slide dark" id="slide-12" data-title="Abschluss">
+  <div class="slide-wash"></div>
   <div class="slide-inner close-layout">
-    <div class="eyebrow reveal" style="justify-content:center">Nächster Schritt</div>
-    <h2 class="reveal delay-1">Gemeinsam entdecken.<br>Gemeinsam planen.<br><span class="gradient-text">Gemeinsam genießen.</span></h2>
-    <p class="lede reveal delay-2">Envie ist fachlich und cloudseitig integriert. Vor dem Launch: App-Check-Enforcement, Multi-Device-Tests und Accessibility-Politur.</p>
-    <div class="close-cta-row reveal delay-3">
-      <a class="cta" href="#slide-1">Envie · zurück zum Anfang ↗</a>
-    </div>
-    <div class="triple-phones reveal delay-4" style="margin-top:48px">
-      <div class="phone-static"><img src="assets/swipe.webp" alt="Swipe"></div>
-      <div class="phone-static" style="transform:translateY(-35px)"><img src="assets/weekplan.webp" alt="Plan"></div>
-      <div class="phone-static"><img src="assets/cooking.webp" alt="Kochen"></div>
+    <div class="eyebrow reveal">Envie</div>
+    <h2 class="reveal delay-1">Vom Rezept.<br>Zum Match.<br><span class="gradient-text">Zum Abend.</span></h2>
+    <p class="lede reveal delay-2">Eine App, die nicht nur Rezepte verwaltet, sondern Entscheidungen bis zum Kochen zu Ende führt.</p>
+    <a class="close-lockup reveal delay-3" href="#slide-1" aria-label="Zurück zum Anfang">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+      <span>Zurück zum Anfang</span>
+    </a>
+    <div class="close-phones reveal delay-4">
+      <div class="device"><div class="device-screen"><img src="assets/swipe.webp" alt="Envie Swipe"></div></div>
+      <div class="device"><div class="device-screen"><img src="assets/weekplan.webp" alt="Envie Wochenplan"></div></div>
+      <div class="device"><div class="device-screen"><img src="assets/cooking.webp" alt="Envie Kochmodus"></div></div>
     </div>
   </div>
   <div class="footer-note">Envie · Pre-Release · Stand 21.06.2026</div>
 </section>
 
 <script>
-/* ── INTERSECTION OBSERVER ─────────────────────────────────────── */
-const slides   = [...document.querySelectorAll('.slide')];
+const slides = Array.from(document.querySelectorAll('.slide'));
 const progress = document.getElementById('progress');
-const current  = document.getElementById('current');
-let active = 0;
+const current = document.getElementById('current');
+let activeIndex = 0;
 
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('is-visible');
-      const idx = slides.indexOf(e.target);
-      if (idx >= 0) { active = idx; current.textContent = String(idx+1).padStart(2,'0'); }
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-visible');
+    const index = slides.indexOf(entry.target);
+    if (index >= 0) {
+      activeIndex = index;
+      current.textContent = String(index + 1).padStart(2, '0');
     }
   });
-}, { threshold: 0.32 });
-slides.forEach(s => io.observe(s));
+}, { threshold: 0.34 });
 
-/* ── PROGRESS BAR ──────────────────────────────────────────────── */
+slides.forEach((slide) => observer.observe(slide));
+
 function updateProgress() {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const value = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = `${value}%`;
 }
-addEventListener('scroll', updateProgress, { passive: true });
-updateProgress();
 
-/* ── NAVIGATION ────────────────────────────────────────────────── */
 function go(delta) {
-  const idx = Math.max(0, Math.min(slides.length - 1, active + delta));
-  slides[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const target = Math.max(0, Math.min(slides.length - 1, activeIndex + delta));
+  slides[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-document.getElementById('prev').onclick = () => go(-1);
-document.getElementById('next').onclick = () => go(1);
-document.getElementById('fs').onclick = () => {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-  else document.exitFullscreen?.();
-};
-addEventListener('keydown', e => {
-  if (['ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); go(1); }
-  if (['ArrowUp','PageUp'].includes(e.key))          { e.preventDefault(); go(-1); }
-  if (e.key === 'Home') slides[0].scrollIntoView({ behavior:'smooth' });
-  if (e.key === 'End')  slides.at(-1).scrollIntoView({ behavior:'smooth' });
+
+document.getElementById('prev').addEventListener('click', () => go(-1));
+document.getElementById('next').addEventListener('click', () => go(1));
+document.getElementById('fs').addEventListener('click', async () => {
+  try {
+    if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.();
+    else await document.exitFullscreen?.();
+  } catch (_) {
+    /* Fullscreen can be blocked by the browser. The deck remains usable. */
+  }
 });
 
-/* ── PARALLAX KICKER NUMBERS ───────────────────────────────────── */
-let ticking = false;
-addEventListener('scroll', () => {
-  if (ticking) return;
-  requestAnimationFrame(() => {
-    slides.forEach(slide => {
-      const kicker = slide.querySelector('.kicker-number');
-      if (!kicker) return;
-      const rect = slide.getBoundingClientRect();
-      const p = 1 - rect.top / innerHeight;
-      if (p > -0.5 && p < 1.6) {
-        kicker.style.transform = `translateY(${(1 - p) * 24}px)`;
-      }
-    });
-    ticking = false;
-  });
-  ticking = true;
-}, { passive: true });
-
-/* ── CARD TILT ON HOVER ────────────────────────────────────────── */
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width  - .5;
-    const y = (e.clientY - r.top)  / r.height - .5;
-    card.style.transform = `translateY(-3px) perspective(600px) rotateX(${-y*3}deg) rotateY(${x*3}deg)`;
-  });
-  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('resize', updateProgress, { passive: true });
+window.addEventListener('keydown', (event) => {
+  if (['ArrowDown', 'PageDown', ' '].includes(event.key)) {
+    event.preventDefault();
+    go(1);
+  }
+  if (['ArrowUp', 'PageUp'].includes(event.key)) {
+    event.preventDefault();
+    go(-1);
+  }
+  if (event.key === 'Home') slides[0].scrollIntoView({ behavior: 'smooth' });
+  if (event.key === 'End') slides.at(-1).scrollIntoView({ behavior: 'smooth' });
 });
+
+updateProgress();
 </script>
 </body>
 </html>

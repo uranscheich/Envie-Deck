@@ -37,6 +37,14 @@ body {
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
+.nav-icon, .line-icon, .tag-icon {
+  display: block; fill: none; stroke: currentColor; stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.nav-icon { width: 18px; height: 18px; margin: auto; }
+.line-icon { width: 27px; height: 27px; }
+.line-icon.small { width: 21px; height: 21px; }
+.tag-icon { width: 13px; height: 13px; flex: 0 0 auto; }
 
 /* ── AMBIENT GRADIENT BG ─────────────────────────────────────── */
 .ambient-orbs { position: fixed; inset: 0; z-index: -5; pointer-events: none; overflow: hidden; }
@@ -320,13 +328,19 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
 
 /* ── KICKER NUMBERS ──────────────────────────────────────────── */
 .kicker-number {
-  position: absolute; right: 3vw; top: 8vh;
-  font-size: min(22vw,340px); font-weight: 900; letter-spacing: -.08em;
-  color: rgba(255,255,255,.022); z-index: -1; pointer-events: none; user-select: none;
-  opacity: 0; transform: translateY(16px);
-  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.2,.8,.2,1);
+  position: absolute; right: clamp(-18px,1.5vw,24px); top: clamp(72px,8vh,120px);
+  font-size: min(27vw,410px); font-weight: 900; letter-spacing: -.095em; line-height: .72;
+  color: rgba(255,255,255,.038);
+  -webkit-text-stroke: 1px rgba(255,255,255,.025);
+  z-index: -1; pointer-events: none; user-select: none;
+  opacity: 0; transform: translateX(110px) scale(.92); translate: 0 0;
+  filter: blur(1.2px);
+  transition: opacity 1.35s ease, transform 1.45s cubic-bezier(.16,.84,.25,1), filter 1.45s ease;
+  will-change: opacity, transform, translate, filter;
 }
-.slide.is-visible .kicker-number { opacity: 1; transform: translateY(0); }
+.slide.is-visible .kicker-number {
+  opacity: .88; transform: translateX(0) scale(1); filter: blur(0);
+}
 
 /* ── SCROLL SNAP ─────────────────────────────────────────────── */
 @media (min-width: 980px) {
@@ -358,7 +372,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
   width: 52px; height: 52px; border-radius: 16px;
   background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; transition: transform .35s ease;
+  color: var(--tone); transition: transform .35s ease;
 }
 .flow-node:hover .flow-node-icon { transform: scale(1.1); }
 .flow-node-title { font-size: 20px; font-weight: 740; letter-spacing: -.03em; }
@@ -435,7 +449,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
   font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
   color: var(--tone); margin-bottom: 20px;
 }
-.pipeline-step-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+.pipeline-step-icon { width: 48px; height: 48px; margin-bottom: 14px; display: grid; place-items: center; border-radius: 15px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08); color: var(--tone); }
 .pipeline-step-title { font-size: 18px; font-weight: 740; margin-bottom: 8px; }
 .pipeline-step p { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
 .pipeline-step-arrow {
@@ -486,6 +500,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
 .vote-phase-detail { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
 .vote-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
 .vote-tag {
+  display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .08em;
   border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
 }
@@ -596,9 +611,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
     <span class="brand-text"><span>envie</span><small>interactive pitch</small></span>
   </a>
   <div class="deck-controls">
-    <button id="prev" aria-label="Vorherige Folie">↑</button>
-    <button id="next" aria-label="Nächste Folie">↓</button>
-    <button id="fs"   aria-label="Vollbild">⛶</button>
+    <button id="prev" aria-label="Vorherige Folie"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/></svg></button>
+    <button id="next" aria-label="Nächste Folie"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m5.5-5.5L12 19l-5.5-5.5"/></svg></button>
+    <button id="fs"   aria-label="Vollbild"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4H4v4.5M15.5 4H20v4.5M20 15.5V20h-4.5M8.5 20H4v-4.5"/></svg></button>
   </div>
 </nav>
 <div class="slide-counter"><span id="current">01</span> / 12</div>
@@ -657,35 +672,35 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
       <div class="card flow-node" style="--tone:var(--pink)">
         <div class="flow-node-accent"></div>
         <div class="flow-node-num">01</div>
-        <div class="flow-node-icon">📷</div>
+        <div class="flow-node-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 8.5h3l1.4-2h6.2l1.4 2h3A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18v-8a1.5 1.5 0 0 1 1.5-1.5Z"/><circle cx="12" cy="14" r="3.3"/></svg></div>
         <div class="flow-node-title">Import</div>
         <p class="flow-node-desc">Kamera, PDF, Web-Share oder Action-Extension — Vision OCR + Foundation Models.</p>
       </div>
       <div class="card flow-node" style="--tone:var(--blue)">
         <div class="flow-node-accent"></div>
         <div class="flow-node-num">02</div>
-        <div class="flow-node-icon">📚</div>
+        <div class="flow-node-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.7 0 5.1.7 8 2.4v11c-2.9-1.7-5.3-2.4-8-2.4v-11Zm16 0c-2.7 0-5.1.7-8 2.4v11c2.9-1.7 5.3-2.4 8-2.4v-11Z"/></svg></div>
         <div class="flow-node-title">Kochbuch</div>
         <p class="flow-node-desc">Strukturierte Alben, Hero-Karussell, tägliche Entdeckungen — SwiftData on-device.</p>
       </div>
       <div class="card flow-node" style="--tone:var(--green)">
         <div class="flow-node-accent"></div>
         <div class="flow-node-num">03</div>
-        <div class="flow-node-icon">♠</div>
+        <div class="flow-node-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="m4.5 7.5-1 .4A2 2 0 0 0 2.3 10.5l3.3 8.2M19.5 7.5l1 .4a2 2 0 0 1 1.2 2.6l-3.3 8.2"/><path d="M10 12h4"/></svg></div>
         <div class="flow-node-title">Entscheiden</div>
         <p class="flow-node-desc">Quick · Woche · Endlos · Friends — drei soziale Scopes, ein Swipe-Erlebnis.</p>
       </div>
       <div class="card flow-node" style="--tone:var(--amber)">
         <div class="flow-node-accent"></div>
         <div class="flow-node-num">04</div>
-        <div class="flow-node-icon">📅</div>
+        <div class="flow-node-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3.5v4M16.5 3.5v4M3.5 10h17M8 14h2M14 14h2M8 17.5h2"/></svg></div>
         <div class="flow-node-title">Planen</div>
         <p class="flow-node-desc">Matches landen direkt im Wochenplan. Einkaufsliste dedupliziert und kategorisiert.</p>
       </div>
       <div class="card flow-node" style="--tone:var(--pink-soft)">
         <div class="flow-node-accent"></div>
         <div class="flow-node-num">05</div>
-        <div class="flow-node-icon">🍳</div>
+        <div class="flow-node-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h12v3.5A5.5 5.5 0 0 1 10.5 20h-1A5.5 5.5 0 0 1 4 14.5V11Z"/><path d="M16 12h5M7 8c0-1 1-1.4 1-2.5S7 4 7 3M11 8c0-1 1-1.4 1-2.5S11 4 11 3"/></svg></div>
         <div class="flow-node-title">Kochen</div>
         <p class="flow-node-desc">Step-by-Step Begleitung, Timer, Live Activity in Dynamic Island und Sperrbildschirm.</p>
       </div>
@@ -803,7 +818,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
 
       <div class="feature-list reveal delay-4">
         <div class="feature-row" style="--tone:var(--pink)">
-          <div class="icon">♥</div>
+          <div class="icon"><svg class="line-icon small" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.4c0 5-8.5 10-8.5 10s-8.5-5-8.5-10A4.4 4.4 0 0 1 12 7.7a4.4 4.4 0 0 1 8.5 1.7Z"/></svg></div>
           <div><h3>Solo-Like</h3><p>Personengebundene Freigabe — kein Plan-Eintrag.</p></div>
         </div>
         <div class="feature-row" style="--tone:var(--green)">
@@ -867,7 +882,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
       <div class="pipeline-step" style="--tone:var(--pink)">
         <div class="pipeline-progress"></div>
         <div class="pipeline-step-label">Input</div>
-        <span class="pipeline-step-icon">📷</span>
+        <span class="pipeline-step-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5A1.5 1.5 0 0 1 7.5 3.5Z"/><path d="M14 3.5V8h4M12 18v-6m-2.5 2.5L12 12l2.5 2.5"/></svg></span>
         <div class="pipeline-step-title">Kamera · PDF · Web</div>
         <p>Share- und Action-Extension. Jede Quelle, die iOS kennt.</p>
         <div class="pipeline-step-arrow">›</div>
@@ -875,7 +890,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
       <div class="pipeline-step" style="--tone:var(--blue)">
         <div class="pipeline-progress"></div>
         <div class="pipeline-step-label">Read</div>
-        <span class="pipeline-step-icon">🔍</span>
+        <span class="pipeline-step-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H5a1 1 0 0 0-1 1v3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10M8 9h8M9 15h6"/></svg></span>
         <div class="pipeline-step-title">Apple Vision OCR</div>
         <p>Texterkennung direkt auf dem Gerät. JSON-LD-Parser für Web-Shares.</p>
         <div class="pipeline-step-arrow">›</div>
@@ -883,7 +898,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
       <div class="pipeline-step" style="--tone:var(--green)">
         <div class="pipeline-progress"></div>
         <div class="pipeline-step-label">Structure</div>
-        <span class="pipeline-step-icon">🧠</span>
+        <span class="pipeline-step-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="2.2"/><circle cx="18" cy="7" r="2.2"/><circle cx="12" cy="17" r="2.2"/><path d="m8 8.2 2.8 6.6M16 8.2l-2.8 6.6M8.2 7h7.6"/></svg></span>
         <div class="pipeline-step-title">Foundation Models</div>
         <p>On-device Apple Intelligence: Zutaten, Schritte, Metadaten. Regex-Fallback.</p>
         <div class="pipeline-step-arrow">›</div>
@@ -891,7 +906,7 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
       <div class="pipeline-step" style="--tone:var(--amber)">
         <div class="pipeline-progress"></div>
         <div class="pipeline-step-label">Control</div>
-        <span class="pipeline-step-icon">✅</span>
+        <span class="pipeline-step-icon"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.4 2.4 5-5.2"/></svg></span>
         <div class="pipeline-step-title">Review &amp; Save</div>
         <p>ImportReviewView: prüfen, korrigieren, lokal in SwiftData sichern.</p>
       </div>
@@ -961,9 +976,9 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
         <div class="vote-phase-title">2×3 Grid-Abstimmung</div>
         <p class="vote-phase-detail">Jeder Teilnehmer bewertet Stacks im Grid. Like = nominiert. Veto = für alle gesperrt. Ballots werden gebündelt an Firestore übertragen.</p>
         <div class="vote-actions">
-          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
-          <span class="vote-tag" style="color:var(--pink)">✗ Veto</span>
-          <span class="vote-tag" style="color:var(--muted)">→ Weitergabe</span>
+          <span class="vote-tag" style="color:var(--green)"><svg class="line-icon small" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.4c0 5-8.5 10-8.5 10s-8.5-5-8.5-10A4.4 4.4 0 0 1 12 7.7a4.4 4.4 0 0 1 8.5 1.7Z"/></svg>Like</span>
+          <span class="vote-tag" style="color:var(--pink)"><svg class="tag-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>Veto</span>
+          <span class="vote-tag" style="color:var(--muted)"><svg class="tag-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>Weitergabe</span>
         </div>
       </div>
       <div class="vote-arrow">→</div>
@@ -972,8 +987,8 @@ h2 { font-size: clamp(38px,6.2vw,108px); max-width: 1150px; margin-bottom: 24px;
         <div class="vote-phase-title">Klassischer Swipe</div>
         <p class="vote-phase-detail">Verbliebene Finalisten aus Phase 1 im gewohnten Swipe-Format. Like oder Pass — schnell und eindeutig.</p>
         <div class="vote-actions">
-          <span class="vote-tag" style="color:var(--green)">♥ Like</span>
-          <span class="vote-tag" style="color:var(--muted)">✗ Pass</span>
+          <span class="vote-tag" style="color:var(--green)"><svg class="line-icon small" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.4c0 5-8.5 10-8.5 10s-8.5-5-8.5-10A4.4 4.4 0 0 1 12 7.7a4.4 4.4 0 0 1 8.5 1.7Z"/></svg>Like</span>
+          <span class="vote-tag" style="color:var(--muted)"><svg class="tag-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>Pass</span>
         </div>
       </div>
       <div class="vote-arrow">→</div>
@@ -1090,7 +1105,7 @@ addEventListener('scroll', () => {
       const rect = slide.getBoundingClientRect();
       const p = 1 - rect.top / innerHeight;
       if (p > -0.5 && p < 1.6) {
-        kicker.style.transform = `translateY(${(1 - p) * 24}px)`;
+        kicker.style.translate = `0 ${(1 - p) * 24}px`;
       }
     });
     ticking = false;
